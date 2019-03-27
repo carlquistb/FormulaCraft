@@ -13,9 +13,20 @@ This implementation will have two high level components. First, a AWS Cloudforma
 	- SMS-API contains required files for the SMS API and it's implementation.
 	- Server-requests constains required files for the functioning of the server itself.
 
+## .gitignore
+	- .pem, .ppk are both keys used for accessing ec2 instances through SSH on Windows.
+	- .txt are almost always my own simple note files. Not necessary for understanding this repo.
+
 # the Stack
 
 	- AWS Cloudformation
 	- EC2 userdata for run on startup services
 	- Node.js for MCServer wrapper.
 	- AWS services including EC2, Lambda, SMS/SQS, etc in API implementation.
+
+# notes
+
+below this section, all of this is just notes for myself.
+
+## resources
+	- https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-up-node-on-ec2-instance.html
