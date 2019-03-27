@@ -1,0 +1,115 @@
+Parameters:
+  MyKeyPair: 
+    Description: Amazon EC2 Key Pair
+    Type: AWS::EC2::KeyPair::KeyName
+  MyInstanceType:
+    Description: Instance Type for Server
+    Type: String
+Resources:
+  IAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "ec2.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+  RolePolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: "mc-ec2-s3-accessPolicy"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Action:
+              - "s3:PutAccountPublicAccessBlock"
+              - "s3:GetAccountPublicAccessBlock"
+              - "s3:ListAllMyBuckets"
+              - "s3:HeadBucket"
+            Resource: "*"
+          -
+            Effect: "Allow"
+            Action:
+              - "s3:*"
+            Resource:
+              - "arn:aws:s3:::bc-minecraft-repo"
+              - "arn:aws:s3:::*/*"
+      Roles:
+        -
+          !Ref IAMRole
+  MyInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: "/"
+      Roles:
+        - !Ref IAMRole
+  MyVPC:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      CidrBlock: 172.32.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+  MyInternetGateway:
+    Type: 'AWS::EC2::InternetGateway'
+  MyGatewayAttachment:
+    Type: 'AWS::EC2::VPCGatewayAttachment'
+    Properties:
+      InternetGatewayId: !Ref MyInternetGateway
+      VpcId: !Ref MyVPC
+  MyRouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref MyVPC
+  MyRoute:
+    Type: 'AWS::EC2::Route'
+    Properties:
+      RouteTableId: !Ref MyRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref MyInternetGateway
+  MySubnetA:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref MyVPC
+      CidrBlock: 172.32.0.0/20
+      MapPublicIpOnLaunch: true
+  MySubnetRouteTableAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref MySubnetA
+      RouteTableId: !Ref MyRouteTable
+  EC2SecGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      VpcId: !Ref MyVPC
+      GroupName: MineCraftEC2SecGroup
+      GroupDescription: Minecraft EC2 Sec Group
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 25565
+          ToPort: 25565
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+  MyInstance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      ImageId: 'ami-0628c11624825b782'
+      SecurityGroupIds:
+        - !Ref EC2SecGroup
+      SubnetId: !Ref MySubnetA
+      InstanceType: !Ref MyInstanceType
+      IamInstanceProfile: !Ref MyInstanceProfile
+      KeyName: !Ref MyKeyPair
+Outputs:
+  PublicIP:
+    Description: "Public IP of Server: connect with Putty and MineCraft"
+    Value: !GetAtt MyInstance.PublicIp
