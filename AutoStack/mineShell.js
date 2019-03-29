@@ -1,4 +1,16 @@
+/*
+	Project: FormulaCraft
+	
+	mineShell is a Node script that will be executed by the userdata of ec2 instances brought online by the AutoStack Cloudformation stack.
 
+	this utilizes the a child process to run Minecraft Server inside this script.
+
+	This script will handle boot up and boot down of the .jar file.
+
+	This script will not handle boot up and boot down of stacks of 
+	
+
+*/
 //load libraries
 const fs = require('fs'); //fileserver library
 const spawn = require('child_process').spawn; //this function creates a child process (basically another shell for Minecraft to run in)

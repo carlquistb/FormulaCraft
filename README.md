@@ -1,4 +1,4 @@
-# MinecraftServer
+# FormulaCraft
 A SMS-based service for running Minecraft server on AWS.
 
 # ThePlan
@@ -9,13 +9,14 @@ This implementation will have two high level components. First, a AWS Cloudforma
 
 # Files
 
-## top level folders
-	- SMS-API contains required files for the SMS API and it's implementation.
-	- Server-requests constains required files for the functioning of the server itself.
-
 ## .gitignore
 	- .pem, .ppk are both keys used for accessing ec2 instances through SSH on Windows.
 	- .txt are almost always my own simple note files. Not necessary for understanding this repo.
+
+## FormulaStack
+	- This Cloudformation script will generate the resources needed to run the API that will give and answer calls for Minecraft Servers. This stack should be left up for the duration of the project's use.
+## AutoStack
+	- This Cloudformation script will create a proprietary stack for each Minecraft Server requested through the API. These stacks will be brought up and down by the API, and will not be generated manually at all, unless for debugging purposes.
 
 # the Stack
 
