@@ -1,4 +1,7 @@
 Parameters:
+# MyServerExitPassword:
+#    Description: what is the answer?
+#    Type: String
   MyServerType:
     Description: Which server would you like to run?
     AllowedValues:
@@ -8,6 +11,7 @@ Parameters:
   MyWorld:
     Description: Which world would you like to load?
     AllowedValues:
+      - world0
       - world1
     Default: world1
     Type: String
@@ -173,7 +177,7 @@ Resources:
                   - "\n"
                   - "node /home/ec2-user/script/mineShell.js"
                   - "\n"
-                  - "echo \"it worked\" > success.txt"
+                  - "echo \"last command in userdata\" > finishedUserData.txt"
           InstanceType: !Ref MyInstanceType
           KeyName: !Ref MyKeyPair
           SecurityGroups:

@@ -7,16 +7,35 @@ A SMS-based service for running Minecraft server on AWS.
 
 This implementation will have two high level components. First, a AWS Cloudformation script that implements the SMS-based API for querying the status of servers being run. Second, a Cloudformation script that implements the stack for each server requested. We will work from the bottom up, hoping to develop the stack,  fully automated, first. Before the creation of this repo, significant work was done creating a working stack allowing for MCServer to run.
 
-# Files
+# code
 
 ## .gitignore
 	- .pem, .ppk are both keys used for accessing ec2 instances through SSH on Windows.
 	- .txt are almost always my own simple note files. Not necessary for understanding this repo.
 
-## FormulaStack
+## FormulaStack.yaml
 	- This Cloudformation script will generate the resources needed to run the API that will give and answer calls for Minecraft Servers. This stack should be left up for the duration of the project's use.
-## AutoStack
+## AutoStack.yaml
 	- This Cloudformation script will create a proprietary stack for each Minecraft Server requested through the API. These stacks will be brought up and down by the API, and will not be generated manually at all, unless for debugging purposes.
+	- set up cronjob to automatically upload world over time.
+	- run mineShell.
+	- clean up save and close down stack...? (TODO: close down stack automation.)
+
+## mineShell.js
+	- This script is responsible for managing the server.jar as a child process. 
+	- user-initiated world save and exit
+	- automated world save (not upload- this will be a cronjob set up in AutoStack.)
+
+## cronjob
+	- this is a executable that will be installed by the EC2 userdata, and will be responsible for upload to s3 periodically.
+
+# dependencies
+
+## S3 bucket structure
+	- Your S3 bucket is required to have a certain degree of organization. subfolders to include:
+		- **server** - this will contain several versions of the server.jar and dependencies. You can include other mod packs, other data packs and textures, etc.
+		- **world** - this will contain world folders (and possibly player folders?? we'll come back to that. Perhaps rename this to **level**)
+		- **dependencies** - this is where the cronjob, mineShell, and other code will reside.
 
 # the Stack
 
