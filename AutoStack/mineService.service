@@ -1,0 +1,14 @@
+[Unit]
+Description=MC Server Node Wrapper Service
+After=cloud-final.service
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=Simple
+RestartSec=1
+User=root
+ExecStart=/root/.nvm/versions/node/v4.4.5/bin/node /home/ec2-user/script/mineShell.js
+
+[Install]
+WantedBy=cloud-init.target
