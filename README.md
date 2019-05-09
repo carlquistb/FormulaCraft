@@ -1,7 +1,7 @@
 # FormulaCraft
 A SMS-based service for running Minecraft server on AWS.
 
-![the project.](image.png)
+![the project.](media/FormulaStack.png)
 
 # ThePlan
 
