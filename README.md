@@ -1,6 +1,8 @@
 # FormulaCraft
 A SMS-based service for running Minecraft server on AWS.
 
+![the project.](image.png)
+
 # ThePlan
 
 **NOTE** that this repo is currently under construction. This is a learning process in which I will dig deeper into a few technologies, and I don't expect it to be complete for a few months.
