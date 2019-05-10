@@ -9,7 +9,7 @@
 	This, conceptually, is just a way for the administrator to manage the creation, update, and deletion of AutoStacks. This may take many forms such as a terminal based API, a website, a SMS API, etc. 
 	5-9-19 note: due to the fact that you must go to an outside company to handle SMS routing to a APIGateway in AWS (and pay an outside company...) we are first implementing a website version of the clientPortal.
 
-[clientPortal basic web frame](../media/clientPortal.png)
+![clientPortal basic web frame](../media/clientPortal.PNG)
 
 ## material dashboard v1.2.0
 
