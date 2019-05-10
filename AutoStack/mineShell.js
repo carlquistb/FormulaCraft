@@ -12,6 +12,7 @@
 
 */
 //load libraries
+const StreamWatcher = require('./StreamWatcher.js');
 const fs = require('fs'); //fileserver library
 const spawn = require('child_process').spawn; //this function creates a child process (basically another shell for Minecraft to run in)
 
