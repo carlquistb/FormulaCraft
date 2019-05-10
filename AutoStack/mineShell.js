@@ -18,18 +18,26 @@ const spawn = require('child_process').spawn; //this function creates a child pr
 //spawn a child_process to run java. reference: child_process.spawn(command[, args][, options])
 const child = spawn('java',['-jar','server.jar','nogui'],{cwd: '/home/ec2-user/mc',stdio: ['pipe','pipe','pipe']});
 
-//set eventlisteners for each pipe received data. reference: child_process<EventEmitter>
-child.stdout.on('data', onData); //stdout for subprocess
-child.stderr.on('data', onData); //stderr for subprocess
-child.on('exit', function onExit() {
-	console.log('mcserver exited through onExit function in mineShell.js');
-	process.exit(0);
-});
-
 //pipe data received from the shell into the subprocess, and from the subprocess through to the shell.
 child.stdout.pipe(process.stdout);
 child.stderr.pipe(process.stderr);
 
+let streamWatcher = new StreamWatcher(child);
+streamWatcher.addOnExit(function () {
+	console.log('mcserver exited through onExit function in mineShell.js');
+	process.exit(0);
+})
+
+let regex42 = /the answer is 42/;
+let regexHelp = /I need help/;
+
+streamWatcher.addWatcher(regex42, function (stdin, regexData) {
+	stdin.write('/say your wish is my command\n');
+});
+
+streamWatcher.addWatcher(regexHelp, function (stdin, regexData) {
+	stdin.write('/say your wish is my command\n');
+});
 /*
 //runs on a set interval.
 function recurringSave() {
@@ -40,16 +48,3 @@ function recurringSave() {
 
 var saveInterval = setInterval(recurringSave,1000*10); //run the recurringSave method every 5 seconds.
 */
-
-//event-listener function. Runs each time a server line-item is printed.
-function onData(data) {
-	console.log('onData entered');
-	//if the player says the answer, save and exit the server.
-	if(String(data).includes("the answer is 42")) {
-		//clearInterval(saveInterval);
-		child.stdin.write('/stop\n');
-	} else if(String(data).includes("I need help")) {
-		console.log(JSON.stringify(child.stdin));
-		child.stdin.write('/say your wish is my command\n');
-	}
-}
