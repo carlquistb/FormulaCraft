@@ -2,8 +2,8 @@ Parameters:
 # MyServerExitPassword:
 #    Description: what is the answer?
 #    Type: String
-  MyServerType:
-    Description: Which server would you like to run?
+  MyFlavor:
+    Description: Which server flavor would you like to run?
     AllowedValues:
       - vanilla
     Default: vanilla
@@ -15,7 +15,7 @@ Parameters:
       - world1
     Default: world1
     Type: String
-  MyKeyPair: 
+  MyKeyPair:
     Description: Amazon EC2 Key Pair
     Type: AWS::EC2::KeyPair::KeyName
   MyInstanceType:
@@ -146,11 +146,11 @@ Resources:
         - IamInstanceProfile:
             Arn: !GetAtt MyInstanceProfile.Arn
           ImageId: 'ami-061392db613a6357b'
-          UserData: 
+          UserData:
             Fn::Base64:
               Fn::Join:
                 - ""
-                - 
+                -
                   - "#!/bin/bash"
                   - "\n"
                   - "yum install java-1.8.0 -y"
@@ -158,7 +158,7 @@ Resources:
                   - "cd /home/ec2-user"
                   - "\n"
                   - "aws s3 sync s3://bc-minecraft-repo/servers/"
-                  - !Ref MyServerType
+                  - !Ref MyFlavor
                   - " /home/ec2-user/mc"
                   - "\n"
                   - "aws s3 sync s3://bc-minecraft-repo/worlds/"
