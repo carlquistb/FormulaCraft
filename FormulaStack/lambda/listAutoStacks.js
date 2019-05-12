@@ -1,14 +1,49 @@
 
-/**
- * A sample Lambda function that takes an AWS CloudFormation stack name
- * and returns the outputs from that stack. Make sure to include permissions
- * for `cloudformation:DescribeStacks` in your execution role!
- *
- * See http://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/walkthrough-custom-resources-lambda-cross-stack-ref.html
- * for documentation on how to use this blueprint.
- */
+/*
+
+name: listAutoStacks
+
+use: clientPortal
+
+description: provides information about AutoStacks. Includes name.
+
+requirements: ServiceRole with read/list permissions in order to access the AWS CFN API. Sometimes requires a timeout of over 5 seconds.
+
+toDo:
+  include numPlayers
+  include uptime and status
+  include stack parameters such as world and flavor
+
+*/
+
+exports.handler = (event, context, callback) => {
+    //console.log('Received event:', JSON.stringify(event, null, 2));
+    console.log('entered exports.handler');
+
+    const aws = require('aws-sdk');
+    const cfn = new aws.CloudFormation();
+
+    let params = {
+        StackStatusFilter: ['CREATE_COMPLETE']
+    };
+    console.log('created params');
+    cfn.listStacks(params, (err, data) => {
+        if (err) {
+            console.log('DescribeStacks call failed. \n', err);
+        } else {
+            //console.log();('successfully reached callback for listStacks');
+            console.log(data.StackSummaries);
+        }
+    });
+};
+
+/*
+
+AWS supplied response code. Not fully understood and most likely not implemented.
+
 const https = require('https');
 const url = require('url');
+
 
 // Sends a response to the pre-signed S3 URL
 function sendResponse(event, callback, logStreamName, responseStatus, responseData) {
@@ -50,38 +85,4 @@ function sendResponse(event, callback, logStreamName, responseStatus, responseDa
     req.write(responseBody);
     req.end();
 }
-
-exports.handler = (event, context, callback) => {
-    //console.log('Received event:', JSON.stringify(event, null, 2));
-
-    if (event.RequestType === 'Delete') {
-        sendResponse(event, callback, context.logStreamName, 'SUCCESS');
-        return;
-    }
-
-    const stackName = event.ResourceProperties.StackName;
-    let responseStatus = 'FAILED';
-    let responseData = {};
-
-    // Verifies that a stack name was passed
-    if (stackName) {
-        const aws = require('aws-sdk');
-
-        const cfn = new aws.CloudFormation();
-        cfn.describeStacks({ StackName: stackName }, (err, data) => {
-            if (err) {
-                responseData = { Error: 'DescribeStacks call failed' };
-                console.log(`${responseData.Error}:\n`, err);
-            } else {
-                // Populates the return data with the outputs from the specified stack
-                responseStatus = 'SUCCESS';
-                data.Stacks[0].Outputs.forEach((output) => responseData[output.OutputKey] = output.OutputValue);
-            }
-            sendResponse(event, callback, context.logStreamName, responseStatus, responseData);
-        });
-    } else {
-        responseData = { Error: 'Stack name not specified' };
-        console.log(responseData.Error);
-        sendResponse(event, callback, context.logStreamName, responseStatus, responseData);
-    }
-};
+*/
