@@ -169,6 +169,8 @@ Resources:
                   - "\n"
                   - "sudo cp /home/ec2-user/service/mineService.service /etc/systemd/system/mineService.service"
                   - "\n"
+                  - "sudo chmod +x /home/ec2-user/service/start"
+                  - "\n"
                   - "sudo systemctl enable mineService"
                   - "\n"
                   - "sudo systemctl start mineService"
