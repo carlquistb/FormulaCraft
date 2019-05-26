@@ -1,14 +1,9 @@
 [Unit]
 Description=MC Server Node Wrapper Service
-After=cloud-final.service network.target
-StartLimitIntervalSec=0
+After=network.target
 
 [Service]
-Type=simple
-Restart=always
+Type=forking
 RestartSec=1
 User=root
-ExecStart=/bin/node /home/ec2-user/scripts/mineShell.js
-
-[Install]
-WantedBy=cloud-init.target
+ExecStart=/home/ec2-user/service/start
