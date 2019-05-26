@@ -145,15 +145,13 @@ Resources:
         LaunchSpecifications:
         - IamInstanceProfile:
             Arn: !GetAtt MyInstanceProfile.Arn
-          ImageId: 'ami-061392db613a6357b'
+          ImageId: 'ami-013c68f8dfa411f89'
           UserData:
             Fn::Base64:
               Fn::Join:
                 - ""
                 -
                   - "#!/bin/bash"
-                  - "\n"
-                  - "yum install java-1.8.0 -y"
                   - "\n"
                   - "cd /home/ec2-user"
                   - "\n"
@@ -165,17 +163,15 @@ Resources:
                   - !Ref MyWorld
                   - " /home/ec2-user/mc/world"
                   - "\n"
-                  - "curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.32.0/install.sh | bash"
+                  - "aws s3 sync s3://bc-minecraft-repo/scripts /home/ec2-user/scripts"
                   - "\n"
-                  - "export NVM_DIR=\"$HOME/.nvm\""
+                  - "aws s3 sync s3://bc-minecraft-repo/service /home/ec2-user/service"
                   - "\n"
-                  - "[ -s \"$NVM_DIR/nvm.sh\" ] && \\. \"$NVM_DIR/nvm.sh\""
+                  - "sudo cp /home/ec2-user/service/mineService.service /etc/systemd/system/mineService.service"
                   - "\n"
-                  - "nvm install 4.4.5"
+                  - "sudo systemctl enable mineService"
                   - "\n"
-                  - "aws s3 sync s3://bc-minecraft-repo/test /home/ec2-user/script"
-                  - "\n"
-                  - "node /home/ec2-user/script/mineShell.js"
+                  - "sudo systemctl start mineService"
                   - "\n"
                   - "echo \"last command in userdata\" > finishedUserData.txt"
           InstanceType: !Ref MyInstanceType
