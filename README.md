@@ -44,6 +44,7 @@ This implementation will have two high level components. First, a AWS Cloudforma
 below this section, all of this is just notes for myself.
 
 ## resources
+- [Tool for building AWS visual structure diagrams!](https://cloudcraft.co/)
 - https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-up-node-on-ec2-instance.html
 - similar project from Positron: https://github.com/positron/aws-minecraft
 - https://www.twilio.com/blog/2014/11/child-processes-streams-minecraft-multiplayer-server-nodejs.html
