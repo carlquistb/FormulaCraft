@@ -3,17 +3,12 @@ Parameters:
 #    Description: what is the answer?
 #    Type: String
   MyFlavor:
-    Description: Which server flavor would you like to run?
-    AllowedValues:
-      - vanilla
-    Default: vanilla
+    Description: Provide the s3 resource path for the flavor you would like to run.
+    Default: s3://bc-minecraft-repo/servers/vanilla
     Type: String
   MyWorld:
-    Description: Which world would you like to load?
-    AllowedValues:
-      - world0
-      - world1
-    Default: world1
+    Description: provide the s3 resource path for the world you would like to run.
+    Default: s3://bc-minecraft-repo/worlds/world1
     Type: String
   MyKeyPair:
     Description: Amazon EC2 Key Pair
@@ -155,11 +150,11 @@ Resources:
                   - "\n"
                   - "cd /home/ec2-user"
                   - "\n"
-                  - "aws s3 sync s3://bc-minecraft-repo/servers/"
+                  - "aws s3 sync "
                   - !Ref MyFlavor
                   - " /home/ec2-user/mc"
                   - "\n"
-                  - "aws s3 sync s3://bc-minecraft-repo/worlds/"
+                  - "aws s3 sync "
                   - !Ref MyWorld
                   - " /home/ec2-user/mc/world"
                   - "\n"
