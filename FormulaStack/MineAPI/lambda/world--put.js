@@ -41,7 +41,7 @@ exports.handler = (event, context, callback) => {
               },
               s3Filepath: {
                 //TODO: this will eventually be replaced by variable fetches, I hope.
-                S: "s3://bc-minecraft-repo/worlds/" + event.queryStringParameters.worldName
+                S: "s3://bc-minecraft-repo/worlds/" + id
               },
               worldID: {
                 S: id
