@@ -162,15 +162,14 @@ Resources:
                   - "\n"
                   - "aws s3 sync s3://bc-minecraft-repo/service /home/ec2-user/service"
                   - "\n"
-                  - "sudo cp /home/ec2-user/service/mineService.service /etc/systemd/system/mineService.service"
+                  - "cp /home/ec2-user/service/mineService.service /etc/systemd/system/mineService.service"
                   - "\n"
-                  - "sudo chmod +x /home/ec2-user/service/start"
+                  - "chmod +x /home/ec2-user/scripts/uploadworld"
                   - "\n"
-                  - "sudo systemctl enable mineService"
+                  - "systemctl enable mineService"
                   - "\n"
-                  - "sudo systemctl start mineService"
+                  - "systemctl start mineService"
                   - "\n"
-                  - "echo \"last command in userdata\" > finishedUserData.txt"
           InstanceType: !Ref MyInstanceType
           KeyName: !Ref MyKeyPair
           SecurityGroups:
