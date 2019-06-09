@@ -8,7 +8,7 @@ example flavor:
 
 {
   "flavorID":"qwvn21nv320rf4n2uv3o12n90iv",
-  "s3Filepath":"bc-minecraft-repo/flavors/vanilla/qwvn21nv320rf4n2uv3o12n90iv",
+  "s3Filepath":"s3://bc-minecraft-repo/servers/vanilla/qwvn21nv320rf4n2uv3o12n90iv",
   "minecraftVersion":"13.2",
-  "flavorDescription":"Vanilla minecraft, latest version water update."s
+  "flavorDescription":"Vanilla minecraft, latest version water update."
 }
