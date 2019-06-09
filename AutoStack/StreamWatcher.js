@@ -34,22 +34,23 @@ function StreamWatcher(child_process) {
  */
 StreamWatcher.prototype.addWatcher = function (pattern, callback) {
 	if (pattern == null || pattern == undefined || pattern == '')
-    	throw new Error("Invalid pattern");
+    		throw new Error("Invalid pattern");
   	if (callback == null || callback == undefined || callback == '')
   		throw new Error("Invalid callback");
 
-	this._patterns.append(pattern);
-	this._callbacks.append(callback);
+	this._patterns.push(pattern);
+	this._callbacks.push(callback);
 	this._checkRep();
 }
 
 /**
  * Adds a callback that will be executed when the child process finishes 
  * executing.
+ *
  * @param callback The function to call on the child process's exit.
  */
 StreamWatcher.prototype.addOnExit = function (callback) {
-	this._procces.on("exit", callback);
+	this._process.on("exit", callback);
 }
 
 function onData(data) {
