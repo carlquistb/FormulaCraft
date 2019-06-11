@@ -28,7 +28,7 @@ function uploadWorld() {
 		if (error) {
 			log("Problem uploading world: " + error);
 		} else if (stderr.length != 0) {
-			log("Error while uploading world: " + error);
+			log("Error while uploading world: " + stderr);
 		}
 	});
 }
@@ -51,16 +51,16 @@ let regex42 = /the answer is 42/;
 let regexHelp = /I need help/;
 
 streamWatcher.addWatcher(regex42, function (stdin, regexData) {
-	stdin.write("/say your wish is my command\n");
+	stdin.write("stop\n");
 });
 
 streamWatcher.addWatcher(regexHelp, function (stdin, regexData) {
-	stdin.write("/say your wish is my command\n");
+	stdin.write("say your wish is my command\n");
 });
 
 // The SIGTERM event will be sent by systemctl when the service is stopped
 process.on("SIGTERM", function () {
-	log("[mineShell] Shutting down server...");
+	log("Shutting down server...");
 	child.stdin.write("say Server shutting down\n");
 	child.stdin.write("stop\n");
 });
