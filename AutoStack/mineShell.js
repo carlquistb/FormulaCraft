@@ -17,8 +17,13 @@ const fs = require('fs'); //fileserver library
 const spawn = require('child_process').spawn; //this function creates a child process (basically another shell for Minecraft to run in)
 const execFile = require('child_process').execFile;
 
+let instance_data = JSON.parse(fs.readFileSync("/home/ec2-user/scripts/instance_data.json"));
+let ram = instance_data["available_ram"];
+
 //spawn a child_process to run java. reference: child_process.spawn(command[, args][, options])
-const child = spawn('java',['-jar','server.jar','nogui'],{cwd: '/home/ec2-user/mc',stdio: ['pipe','pipe','pipe']});
+let commandLineOpts = ["-Xmx" + ram, "-Xms" + ram, "-jar", "server.jar", "nogui"];
+let spawnOpts = {"cwd": "/home/ec2-user/mc", "stdio": ["pipe", "pipe", "pipe"]};
+const child = spawn('java', commandLineOpts, spawnOpts);
 
 function uploadWorld() {
 	log("Uploading world...");
@@ -60,7 +65,7 @@ streamWatcher.addWatcher(regexHelp, function (stdin, regexData) {
 
 // The SIGTERM event will be sent by systemctl when the service is stopped
 process.on("SIGTERM", function () {
-	log("Shutting down server...");
+	log("[mineShell] Shutting down server...");
 	child.stdin.write("say Server shutting down\n");
 	child.stdin.write("stop\n");
 });

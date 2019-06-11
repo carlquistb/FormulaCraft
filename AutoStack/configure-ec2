@@ -1,0 +1,41 @@
+#!/bin/bash
+if [[ $# -ne 2 ]]; then
+	echo "Usage: $0 <s3 world url> <s3 flavor url>" > error.log
+	exit
+fi
+
+WORLD_URL=$1
+FLAVOR_URL=$2
+
+cd /home/ec2-user
+aws s3 sync $FLAVOR_URL mc
+aws s3 sync $WORLD_URL mc/world
+
+aws s3 sync s3://bc-minecraft-repo/scripts scripts
+aws s3 sync s3://bc-minecraft-repo/service service
+
+cp service/mineService.service /etc/systemd/system/mineService.service
+
+INSTANCE_TYPE=$(curl -s http://169.254.169.254/latest/meta-data/instance-type)
+
+if [[ "$INSTANCE_TYPE" = "t3.micro" ]]; then
+	AVAILABLE_RAM=800M
+elif [[ "$INSTANCE_TYPE" = "m5.large" ]]; then
+	AVAILABLE_RAM=7G
+elif [[ "$INSTANCE_TYPE" = "r5.large" ]]; then
+	AVAILABLE_RAM=15G
+elif [[ "$INSTANCE_TYPE" = "m5.xlarge" ]]; then
+	AVAILABLE_RAM=15G
+elif [[ "$INSTANCE_TYPE" = "r5.xlarge" ]]; then
+	AVAILABLE_RAM=31G
+fi
+
+if [[ -z "$AVAILABLE_RAM" ]]; then
+	echo "Unkown instance type '$INSTANCE_TYPE'" > error.log
+	exit
+fi
+
+echo "{\"available_ram\":\"$AVAILABLE_RAM\"}" > scripts/instance_data.json
+
+chmod +x /home/ec2-user/scripts/uploadworld
+systemctl start mineService
