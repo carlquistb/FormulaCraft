@@ -12,7 +12,7 @@
 
 ### IAM
 
-  In IAM, each Lambda function will require a seperate IAM role. These roles will grant access to specific DynamoDB tables, aws-sdk methods, etc. By default, each role will need basic Lambda execution as well as cloudwatch log access.
+  In IAM, each Lambda function will require a separate IAM role. These roles will grant access to specific DynamoDB tables, aws-sdk methods, etc. By default, each role will need basic Lambda execution as well as cloudwatch log access.
 
 ### Cloudwatch
 
@@ -20,8 +20,8 @@
 
 # Files
 
-- Within the lambda folder below, you will find the code of each of our lambda functions, as well as the setup details for each.
-- Within the Documentation folder, you will find documentation regarding each API endpoint. This will supercede any documentation built into API gateway, because I currently don't trust or plan to use that feature.
+- Within the lambda folder, you will find the code of each of our lambda functions, as well as the setup details for each.
+- Within the Documentation folder, you will find documentation regarding each API endpoint.
 
 # helpful resources
 - [best practices for RESTful APIs](https://medium.com/@mwaysolutions/10-best-practices-for-better-restful-api-cbe81b06f291)
