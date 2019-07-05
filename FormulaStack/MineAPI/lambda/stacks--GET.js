@@ -35,8 +35,7 @@ function createListStacksHandler(callback) {
             console.log(err, err.stack);
 
             //define and return response
-
-            var response = {
+            let response = {
                 isBase64Encoded: true,
                 statusCode: 400,
                 headers: {},
@@ -44,46 +43,45 @@ function createListStacksHandler(callback) {
             };
 
             callback(err, response);
-        } else { //method success callback fn
-            console.log(data.StackSummaries);
+            return;
+        }
+        //method success callback fn
+        console.log(data.StackSummaries);
 
-            //define and return HTTP response
-
-            var body = data.StackSummaries;
-
-            const response = {
-                isBase64Encoded: true,
-                statusCode: 200,
-                headers: {},
-                body: JSON.stringify(body)
+        data.StackSummaries.forEach(function(summary) {
+            //list stack resources
+            console.log('print id of each stackSummary: ' + summary.StackId);
+            let listResourceParams = {
+                StackName: summary.StackId
             };
 
-            data.StackSummaries.forEach(function(summary) {
-                //list stack resources
-                console.log('print id of each stackSummary: ' + summary.StackId);
-                var listResourceParams = {
-                    StackName: summary.StackId
-                };
+            cfn.listStackResources(listResourceParams, listStackResources);
+        });
 
-                cfn.listStackResources(listResourceParams, listStackResources);
-            });
+        //define and return HTTP response
+        let body = data.StackSummaries;
+        let response = {
+            isBase64Encoded: true,
+            statusCode: 200,
+            headers: {},
+            body: JSON.stringify(body)
+        };
 
-            callback(null, response);
-        }
-
+        callback(null, response);
     }
 }
 
 function listStackResources(err, data) {
     if (err) {
         console.log(err, err.stack);
-    } else {
-        //find the resource with type AWS::EC2::SpotFleet
-        data.StackResourceSummaries.filter(function(resource) {
-            return item.ResourceType === 'AWS::EC2::SpotFleet';
-
-        }).forEach(describeSpotFleetInstance);
+        return;
     }
+
+    //find the resource with type AWS::EC2::SpotFleet
+    data.StackResourceSummaries.filter(function(resource) {
+        return item.ResourceType === 'AWS::EC2::SpotFleet';
+
+    }).forEach(describeSpotFleetInstance);
 }
 
 function describeSpotFleetInstance(resource) {
@@ -94,13 +92,16 @@ function describeSpotFleetInstance(resource) {
         SpotFleetRequestId: resource.PhysicalResourceId
     };
     console.log('params:', resource.PhysicalResourceId);
-    ec2.describeSpotFleetInstances(params, spotFleetDescriber);
+    ec2.describeSpotFleetInstances(params, createSpotFleetDescriberHandler(ec2));
 }
 
-function spotFleetDescriberHandler(err, data) {
-    if (err) {
-        console.log(err, err.stack);
-    } else {
+function createSpotFleetDescriberHandler(ec2) {
+    return function(err, data) {
+        if (err) {
+            console.log(err, err.stack);
+            return;
+        }
+
         console.log(data.ActiveInstances);
 
         params = {
