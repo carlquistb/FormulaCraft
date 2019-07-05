@@ -58,18 +58,15 @@ function createListStacksHandler(callback) {
                 body: JSON.stringify(body)
             };
 
-            var summary;
-            for (summary of data.StackSummaries) {
-
+            data.StackSummaries.forEach(function(summary) {
                 //list stack resources
                 console.log('print id of each stackSummary: ' + summary.StackId);
                 var listResourceParams = {
                     StackName: summary.StackId
                 };
 
-                cfn.listStackResources(listResourceParams, createListStackResourcesHandler(callback));
-
-            }
+                cfn.listStackResources(listResourceParams, listStackResources);
+            });
 
             callback(null, response);
         }
@@ -77,17 +74,15 @@ function createListStacksHandler(callback) {
     }
 }
 
-function createListStackResourcesHandler(callback) {
-    return function(err, data) {
-        if (err) {
-            console.log(err, err.stack);
-        } else {
-            //find the resource with type AWS::EC2::SpotFleet
-            data.StackResourceSummaries.filter(function(resource) {
-                return item.ResourceType === 'AWS::EC2::SpotFleet';
+function listStackResources(err, data) {
+    if (err) {
+        console.log(err, err.stack);
+    } else {
+        //find the resource with type AWS::EC2::SpotFleet
+        data.StackResourceSummaries.filter(function(resource) {
+            return item.ResourceType === 'AWS::EC2::SpotFleet';
 
-            }).forEach(describeSpotFleetInstance);
-        }
+        }).forEach(describeSpotFleetInstance);
     }
 }
 
