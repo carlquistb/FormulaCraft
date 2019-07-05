@@ -53,10 +53,10 @@ exports.handler = async (event, context, callback) => {
     console.log(listStacksData.StackSummaries.length);
     console.log(listStacksData.StackSummaries);
 
-    let stacks = listStacksData.StackSummaries.map(function(summary) {
+    let stacks = await Promise.all(listStacksData.StackSummaries.map(async function(summary) {
       //list stack resources
       console.log('logging id of each stack: ' + summary.StackId);
-        var stackIps = getStackIps(summary.StackId);
+      var stackIps = await getStackIps(summary.StackId);
       console.log("stackIps: ", stackIps);
       return {
         stackId: summary.StackId,
@@ -64,8 +64,7 @@ exports.handler = async (event, context, callback) => {
         stackCreationTime: summary.CreationTime,
         stackIps: stackIps
       };
-
-    });
+    }));
 
     //define and return HTTP response
     let responseBody = {
@@ -89,67 +88,67 @@ exports.handler = async (event, context, callback) => {
 
 //returns array of Strings representing public ipv4 addresses for the stack.
 async function getStackIps(stackId) {
-    let listStackResourcesParams = {
-      StackName: stackId
-    };
+  let listStackResourcesParams = {
+    StackName: stackId
+  };
 
-    var resourcesData;
+  var resourcesData;
 
-    //TODO: error handling
-    try {
-      resourcesData = await cfn.listStackResources(listStackResourcesParams).promise();
-    }
-    catch (err){
-      console.log(err, err.stack);
-      return;
-    }
+  //TODO: error handling
+  try {
+    resourcesData = await cfn.listStackResources(listStackResourcesParams).promise();
+  }
+  catch (err){
+    console.log(err, err.stack);
+    return;
+  }
 
-    //find the resources with type AWS::EC2::SpotFleet (expected: 1)
+  //find the resources with type AWS::EC2::SpotFleet (expected: 1)
 
-    let spotfleets = resourcesData.StackResourceSummaries.filter(function(resource) {
-      return resource.ResourceType === 'AWS::EC2::SpotFleet';
-    });
+  let spotfleets = resourcesData.StackResourceSummaries.filter(function(resource) {
+    return resource.ResourceType === 'AWS::EC2::SpotFleet';
+  });
 
-    if(spotfleets.length > 1) {
-      console.log("ERROR: stack contains more than one spotfleet resource. Each stack is expected to have a single spotfleet resource.");
-      return;
-    }
+  if(spotfleets.length > 1) {
+    console.log("ERROR: stack contains more than one spotfleet resource. Each stack is expected to have a single spotfleet resource.");
+    return;
+  }
 
-    let spotfleet = spotfleets[0];
+  let spotfleet = spotfleets[0];
 
-    //get the ips of all instances (expected: 1) in the spotfleet
-    var ec2 = new aws.EC2();
-    let describeSpotFleetInstancesParams = {
-      SpotFleetRequestId: spotfleet.PhysicalResourceId
-    };
+  //get the ips of all instances (expected: 1) in the spotfleet
+  var ec2 = new aws.EC2();
+  let describeSpotFleetInstancesParams = {
+    SpotFleetRequestId: spotfleet.PhysicalResourceId
+  };
 
-    var describeSpotFleetInstancesData;
+  var describeSpotFleetInstancesData;
 
-    try{
-      describeSpotFleetInstancesData = await ec2.describeSpotFleetInstances(describeSpotFleetInstancesParams).promise();
-    }
-    catch (err) {
-      console.log(err, err.stack);
-      return;
-    }
+  try{
+    describeSpotFleetInstancesData = await ec2.describeSpotFleetInstances(describeSpotFleetInstancesParams).promise();
+  }
+  catch (err) {
+    console.log(err, err.stack);
+    return;
+  }
 
-    var describeInstancesparams = {
-        InstanceIds: [describeSpotFleetInstancesData.ActiveInstances[0].InstanceId]
-    };
+  var describeInstancesparams = {
+      InstanceIds: [describeSpotFleetInstancesData.ActiveInstances[0].InstanceId]
+  };
 
-    var describeInstancesData;
+  var describeInstancesData;
 
-    try{
-      describeInstancesData = await ec2.describeInstances(describeInstancesparams).promise();
-    }
-    catch (err) {
-      console.log(err, err.stack);
-    }
+  try{
+    describeInstancesData = await ec2.describeInstances(describeInstancesparams).promise();
+  }
+  catch (err) {
+    console.log(err, err.stack);
+  }
 
-    var ips = describeInstancesData.Reservations[0].Instances.map(function(instance) {return instance.PublicIpAddress;});
+  var ips = describeInstancesData.Reservations[0].Instances.map(function(instance) {return instance.PublicIpAddress;});
 
-    console.log("logging ips");
-    console.log("ips:",ips);
+  console.log("logging ips");
+  console.log("ips:",ips);
 
-    return ips;
+  return(ips);
 }
