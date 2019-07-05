@@ -21,92 +21,93 @@ const aws = require('aws-sdk');
 
 const cfn = new aws.CloudFormation();
 
-exports.handler = (event, context, callback) => {
+exports.handler = async (event, context, callback) => {
 
     var params = {
-        StackStatusFilter: ['CREATE_COMPLETE', 'CREATE_IN_PROGRESS', 'DELETE_IN_PROGRESS']
+      StackStatusFilter: ['CREATE_COMPLETE', 'CREATE_IN_PROGRESS', 'DELETE_IN_PROGRESS']
     };
 
     console.log('querying current stacks');
-    cfn.listStacks(params, createListStacksHandler(callback));
 
-};
+    var listStacksData;
 
-function createListStacksHandler(callback) {
-    return function(err, data) {
-        if (err) {
-            console.log(err, err.stack);
-
-            //define and return response
-            let response = {
-                isBase64Encoded: true,
-                statusCode: 400,
-                headers: {},
-                body: JSON.stringify({})
-            };
-
-            callback(err, response);
-            return;
-        }
-        //method success callback fn
-        console.log("logging number of retreived stacks");
-        console.log(data.StackSummaries.length);
-        console.log(data.StackSummaries);
-
-        let stacks = data.StackSummaries.map(function(summary) {
-            //list stack resources
-            console.log('print id of each stackSummary: ' + summary.StackId);
-
-            return {
-              stackId: summary.StackId,
-              stackName: summary.StackName,
-              stackCreationTime: summary.CreationTime,
-              stackIps: getStackIps(summary.StackId)
-            };
-
-        });
-
-        //define and return HTTP response
-        let responseBody = {
-          numStacks: data.StackSummaries.length,
-          stacks: stacks
-        };
-
-        let response = {
-            isBase64Encoded: true,
-            statusCode: 200,
-            headers: {},
-            body: JSON.stringify(responseBody)
-        };
-
-        callback(null, response);
+    try {
+      listStacksData = await cfn.listStacks(params).promise();
     }
+    catch (err) {
+      console.log(err, err.stack);
+
+      //define and return response
+      let response = {
+        isBase64Encoded: true,
+        statusCode: 400,
+        headers: {},
+        body: JSON.stringify({})
+      };
+
+      callback(err, response);
+      return;
+    }
+
+    console.log("logging number of retreived stacks");
+    console.log(listStacksData.StackSummaries.length);
+    console.log(listStacksData.StackSummaries);
+
+    let stacks = listStacksData.StackSummaries.map(function(summary) {
+      //list stack resources
+      console.log('logging id of each stack: ' + summary.StackId);
+        var stackIps = getStackIps(summary.StackId);
+      console.log("stackIps: ", stackIps);
+      return {
+        stackId: summary.StackId,
+        stackName: summary.StackName,
+        stackCreationTime: summary.CreationTime,
+        stackIps: stackIps
+      };
+
+    });
+
+    //define and return HTTP response
+    let responseBody = {
+      numStacks: listStacksData.StackSummaries.length,
+      stacks: stacks
+    };
+
+    let response = {
+      isBase64Encoded: true,
+      statusCode: 200,
+      headers: {},
+      body: JSON.stringify(responseBody)
+    };
+
+    console.log("logging response");
+    console.log("resonse: ", response);
+
+    callback(null, response);
+
 }
 
-function getStackIps(stackId) {
-
-  let params = {
+//returns array of Strings representing public ipv4 addresses for the stack.
+async function getStackIps(stackId) {
+    let listStackResourcesParams = {
       StackName: stackId
-  };
+    };
 
-  var ips;
+    var resourcesData;
 
-  cfn.listStackResources(params, createListStackResourcesHandler(ips));
-
-  return ips;
-}
-
-function createListStackResourcesHandler(ips) {
-  return function(err, data) {
-    if (err) {
-        console.log(err, err.stack);
-        return;
+    //TODO: error handling
+    try {
+      resourcesData = await cfn.listStackResources(listStackResourcesParams).promise();
+    }
+    catch (err){
+      console.log(err, err.stack);
+      return;
     }
 
     //find the resources with type AWS::EC2::SpotFleet (expected: 1)
-    let spotfleets = data.StackResourceSummaries.filter(function(resource) {
-        return resource.ResourceType === 'AWS::EC2::SpotFleet';
 
+    let spotfleets = resourcesData.StackResourceSummaries.filter(function(resource) {
+      return resource.ResourceType === 'AWS::EC2::SpotFleet';
     });
 
     if(spotfleets.length > 1) {
@@ -118,41 +119,37 @@ function createListStackResourcesHandler(ips) {
 
     //get the ips of all instances (expected: 1) in the spotfleet
     var ec2 = new aws.EC2();
-    let params = {
+    let describeSpotFleetInstancesParams = {
       SpotFleetRequestId: spotfleet.PhysicalResourceId
     };
-    ec2.describeSpotFleetInstances(params, createSpotFleetDescriberHandler(ec2, ips));
 
-  }
-}
+    var describeSpotFleetInstancesData;
 
-function createSpotFleetDescriberHandler(ec2, ips) {
-    return function(err, data) {
-        if (err) {
-            console.log(err, err.stack);
-            return;
-        }
-
-        console.log(data.ActiveInstances);
-
-        var params = {
-            InstanceIds: [data.ActiveInstances[0].InstanceId]
-        };
-
-        ec2.describeInstances(params, createDescribeInstanceHandler(ips));
+    try{
+      describeSpotFleetInstancesData = await ec2.describeSpotFleetInstances(describeSpotFleetInstancesParams).promise();
     }
-}
-
-function createDescribeInstanceHandler(ips) {
-  return function(err, data) {
-    if (err) console.log(err, err.stack);
-    else {
-        console.log('describing instances');
-        console.log(data);
-        console.log('logging IP address');
-        console.log(data.Reservations[0].Instances[0].PublicIpAddress);
-
-        ips = data.Reservations[0].Instances.map(function(instance) {return instance.PublicIpAddress;});
+    catch (err) {
+      console.log(err, err.stack);
+      return;
     }
-  }
+
+    var describeInstancesparams = {
+        InstanceIds: [describeSpotFleetInstancesData.ActiveInstances[0].InstanceId]
+    };
+
+    var describeInstancesData;
+
+    try{
+      describeInstancesData = await ec2.describeInstances(describeInstancesparams).promise();
+    }
+    catch (err) {
+      console.log(err, err.stack);
+    }
+
+    var ips = describeInstancesData.Reservations[0].Instances.map(function(instance) {return instance.PublicIpAddress;});
+
+    console.log("logging ips");
+    console.log("ips:",ips);
+
+    return ips;
 }
