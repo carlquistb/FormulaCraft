@@ -11,11 +11,11 @@ output:
 
 */
 
+const aws = require('aws-sdk');
+
+const cfn = new aws.CloudFormation();
+
 exports.handler = (event, context, callback) => {
-
-    const aws = require('aws-sdk');
-
-    const cfn = new aws.CloudFormation();
 
     var params = {
         StackStatusFilter: ['CREATE_COMPLETE', 'CREATE_IN_PROGRESS', 'DELETE_IN_PROGRESS']
@@ -79,7 +79,7 @@ function listStackResources(err, data) {
 
     //find the resource with type AWS::EC2::SpotFleet
     data.StackResourceSummaries.filter(function(resource) {
-        return item.ResourceType === 'AWS::EC2::SpotFleet';
+        return resource.ResourceType === 'AWS::EC2::SpotFleet';
 
     }).forEach(describeSpotFleetInstance);
 }
@@ -88,7 +88,7 @@ function describeSpotFleetInstance(resource) {
     console.log(resource.PhysicalResourceId);
     //describe the instances inside the fleet
     var ec2 = new aws.EC2();
-    params = {
+    var params = {
         SpotFleetRequestId: resource.PhysicalResourceId
     };
     console.log('params:', resource.PhysicalResourceId);
@@ -104,7 +104,7 @@ function createSpotFleetDescriberHandler(ec2) {
 
         console.log(data.ActiveInstances);
 
-        params = {
+        var params = {
             InstanceIds: [data.ActiveInstances[0].InstanceId]
         };
 
@@ -113,7 +113,8 @@ function createSpotFleetDescriberHandler(ec2) {
             else {
                 console.log('describing instances');
                 console.log(data);
-                console.log(data.Reservations[0].Instances);
+                console.log('logging IP address');
+                console.log(data.Reservations[0].Instances[0].PublicIpAddress);
             }
         });
     }
