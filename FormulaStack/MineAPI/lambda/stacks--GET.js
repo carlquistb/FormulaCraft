@@ -6,8 +6,14 @@ Description: First version of function to retrieve stack information.
 paramenters:
 
 output:
-  stackName
-  stackCreationTime
+  {
+    numStacks: int
+    stacks: [
+      stackName: string
+      stackCreationTime: string
+      stackIPaddress: string
+    ]
+  }
 
 */
 
@@ -23,9 +29,6 @@ exports.handler = (event, context, callback) => {
 
     console.log('querying current stacks');
     cfn.listStacks(params, createListStacksHandler(callback));
-
-
-
 
 };
 
@@ -46,56 +49,84 @@ function createListStacksHandler(callback) {
             return;
         }
         //method success callback fn
+        console.log("logging number of retreived stacks");
+        console.log(data.StackSummaries.length);
         console.log(data.StackSummaries);
 
-        data.StackSummaries.forEach(function(summary) {
+        let stacks = data.StackSummaries.map(function(summary) {
             //list stack resources
             console.log('print id of each stackSummary: ' + summary.StackId);
-            let listResourceParams = {
-                StackName: summary.StackId
+
+            return {
+              stackId: summary.StackId,
+              stackName: summary.StackName,
+              stackCreationTime: summary.CreationTime,
+              stackIps: getStackIps(summary.StackId)
             };
 
-            cfn.listStackResources(listResourceParams, listStackResources);
         });
 
         //define and return HTTP response
-        let body = data.StackSummaries;
+        let responseBody = {
+          numStacks: data.StackSummaries.length,
+          stacks: stacks
+        };
+
         let response = {
             isBase64Encoded: true,
             statusCode: 200,
             headers: {},
-            body: JSON.stringify(body)
+            body: JSON.stringify(responseBody)
         };
 
         callback(null, response);
     }
 }
 
-function listStackResources(err, data) {
+function getStackIps(stackId) {
+
+  let params = {
+      StackName: stackId
+  };
+
+  var ips;
+
+  cfn.listStackResources(params, createListStackResourcesHandler(ips));
+
+  return ips;
+}
+
+function createListStackResourcesHandler(ips) {
+  return function(err, data) {
     if (err) {
         console.log(err, err.stack);
         return;
     }
 
-    //find the resource with type AWS::EC2::SpotFleet
-    data.StackResourceSummaries.filter(function(resource) {
+    //find the resources with type AWS::EC2::SpotFleet (expected: 1)
+    let spotfleets = data.StackResourceSummaries.filter(function(resource) {
         return resource.ResourceType === 'AWS::EC2::SpotFleet';
 
-    }).forEach(describeSpotFleetInstance);
-}
+    });
 
-function describeSpotFleetInstance(resource) {
-    console.log(resource.PhysicalResourceId);
-    //describe the instances inside the fleet
+    if(spotfleets.length > 1) {
+      console.log("ERROR: stack contains more than one spotfleet resource. Each stack is expected to have a single spotfleet resource.");
+      return;
+    }
+
+    let spotfleet = spotfleets[0];
+
+    //get the ips of all instances (expected: 1) in the spotfleet
     var ec2 = new aws.EC2();
-    var params = {
-        SpotFleetRequestId: resource.PhysicalResourceId
+    let params = {
+      SpotFleetRequestId: spotfleet.PhysicalResourceId
     };
-    console.log('params:', resource.PhysicalResourceId);
-    ec2.describeSpotFleetInstances(params, createSpotFleetDescriberHandler(ec2));
+    ec2.describeSpotFleetInstances(params, createSpotFleetDescriberHandler(ec2, ips));
+
+  }
 }
 
-function createSpotFleetDescriberHandler(ec2) {
+function createSpotFleetDescriberHandler(ec2, ips) {
     return function(err, data) {
         if (err) {
             console.log(err, err.stack);
@@ -108,14 +139,20 @@ function createSpotFleetDescriberHandler(ec2) {
             InstanceIds: [data.ActiveInstances[0].InstanceId]
         };
 
-        ec2.describeInstances(params, function(err, data) {
-            if (err) console.log(err, err.stack);
-            else {
-                console.log('describing instances');
-                console.log(data);
-                console.log('logging IP address');
-                console.log(data.Reservations[0].Instances[0].PublicIpAddress);
-            }
-        });
+        ec2.describeInstances(params, createDescribeInstanceHandler(ips));
     }
+}
+
+function createDescribeInstanceHandler(ips) {
+  return function(err, data) {
+    if (err) console.log(err, err.stack);
+    else {
+        console.log('describing instances');
+        console.log(data);
+        console.log('logging IP address');
+        console.log(data.Reservations[0].Instances[0].PublicIpAddress);
+
+        ips = data.Reservations[0].Instances.map(function(instance) {return instance.PublicIpAddress;});
+    }
+  }
 }
