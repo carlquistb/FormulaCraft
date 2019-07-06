@@ -4,7 +4,7 @@ Develop date: 6/8
 Description: First version of function to retrieve stack information.
 
 paramenters:
-
+  none.
 output:
   {
     numStacks: int
