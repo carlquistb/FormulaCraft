@@ -64,7 +64,9 @@ exports.handler = (event, context, callback) => {
         var response = {
             isBase64Encoded: true,
             statusCode: 400,
-            headers: {},
+            headers: {
+            "x-custom-header" : "my custom header value"
+            },
             body: JSON.stringify({})
         };
 
@@ -98,7 +100,9 @@ exports.handler = (event, context, callback) => {
         const response = {
             isBase64Encoded: true,
             statusCode: 200,
-            headers: {},
+            headers: {
+            "x-custom-header" : "my custom header value"
+            },
             body: JSON.stringify(body)
         };
 
