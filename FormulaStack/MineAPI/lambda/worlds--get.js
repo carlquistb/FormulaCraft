@@ -65,7 +65,9 @@ exports.handler = (event, context, callback) => {
             isBase64Encoded: true,
             statusCode: 400,
             headers: {
-            "x-custom-header" : "my custom header value"
+            "x-custom-header" : "my custom header value",
+            'Access-Control-Allow-Origin':'*',
+            "Content-Type" : "application/json"
             },
             body: JSON.stringify({})
         };
@@ -101,7 +103,9 @@ exports.handler = (event, context, callback) => {
             isBase64Encoded: true,
             statusCode: 200,
             headers: {
-            "x-custom-header" : "my custom header value"
+            "x-custom-header" : "my custom header value",
+            'Access-Control-Allow-Origin':'*',
+            "Content-Type" : "application/json"
             },
             body: JSON.stringify(body)
         };
