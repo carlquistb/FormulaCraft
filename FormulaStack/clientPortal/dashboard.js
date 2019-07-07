@@ -32,7 +32,7 @@ function refreshWorlds() {
 function injectWorlds(data) {
 
   var row = $("#worlds-cards-row");
-  alert(data);
+  alert(data.items.length);
 
   for(var i = 0; i < data.items.length; i++){
     var column = document.createElement("div");
