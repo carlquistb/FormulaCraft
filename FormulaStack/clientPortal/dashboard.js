@@ -21,12 +21,19 @@ function refreshWorlds() {
       }
     }
   )
-  .then(function(data){
-    if(!(data.status >= 200 && data.status < 300)){
-      alert("server responded with " + data.status);
-    }
-    injectWorlds(data.text());
-  });
+  .then(checkRequestStatus)
+  .then(injectWorlds)
+  .catch(alert);
+}
+
+function checkRequestStatus(response) {
+  if (response.status >= 200 && response.status < 300) {
+       return response.text();
+  }
+  else {
+     return Promise.reject(new Error(response.status +
+                                      ": " + response.statusText));
+  }
 }
 
 function injectWorlds(data) {
