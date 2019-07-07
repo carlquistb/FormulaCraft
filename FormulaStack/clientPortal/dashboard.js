@@ -9,7 +9,7 @@ $("#refresh-worlds").click(refreshWorlds);
 function refreshWorlds() {
 
   //obtain new worlds data.
-  var url = API_URL + "/flavors";
+  var url = API_URL + "/worlds";
   var urlParams = "limit=5"
 
   fetch(
