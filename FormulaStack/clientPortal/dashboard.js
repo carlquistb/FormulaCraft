@@ -32,6 +32,7 @@ function refreshWorlds() {
 function injectWorlds(data) {
 
   var row = $("#worlds-cards-row");
+  row.innerHTML = JSON.stringify(data);
   alert(data.items.length);
 
   for(var i = 0; i < data.items.length; i++){
