@@ -22,10 +22,16 @@ function refreshWorlds() {
     }
   )
   .then(function(data){
-    if(data.status >= 200 && data.status < 300)
+    if(!(data.status >= 200 && data.status < 300)){
       alert("server responded with " + data.status);
+    }
     injectWorlds(data);
   });
+
+function injectWorlds(data) {
+  var row = $("#worlds-cards-row");
+  row.append(data);
+}
   // $.get(url+"?"+urlParams,function(data){
   //   //format and append worlds data.
   //   var row = $("#worlds-cards-row");
