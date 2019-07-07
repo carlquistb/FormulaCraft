@@ -27,31 +27,11 @@ function refreshWorlds() {
     }
     injectWorlds(data);
   });
+}
 
 function injectWorlds(data) {
   var row = $("#worlds-cards-row");
   row.append(data);
 }
-  // $.get(url+"?"+urlParams,function(data){
-  //   //format and append worlds data.
-  //   var row = $("#worlds-cards-row");
-  //   row.append(data);
-  // });
-  // $.ajax(
-  //   {
-  //     type: "GET",
-  //     url: url+"?"+urlParams,
-  //     crossDomain: true,
-  //     contentType: "json",
-  //     dataType: "json",
-  //     success: function(data) {
-  //       //format and append worlds data.
-  //       var row = $("#worlds-cards-row");
-  //       row.append(data);
-  //     }
-  //   }
-  // );
-}
-
 
 })();
