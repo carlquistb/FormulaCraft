@@ -25,7 +25,7 @@ function refreshWorlds() {
     if(!(data.status >= 200 && data.status < 300)){
       alert("server responded with " + data.status);
     }
-    injectWorlds(data);
+    injectWorlds(data.text());
   });
 }
 
