@@ -30,8 +30,26 @@ function refreshWorlds() {
 }
 
 function injectWorlds(data) {
+
   var row = $("#worlds-cards-row");
   alert(data);
+
+  for(var i = 0; i < data.items.length; i++){
+    var column = document.createElement("div");
+    column.classList.add("col-lg-4","col-md-6","col-sm-6");
+
+    var card = document.createElement("div");
+    card.classList.add("card","card-stats");
+    column.appendChild(card);
+
+    var cardHeader = document.createElement("div");
+    cardHeader.classList.add("card-header");
+    cardHeader.innerHTML = data.items[i].worldName;
+    card.appendChild(cardHeader);
+  }
+
+
+
 }
 
 })();
