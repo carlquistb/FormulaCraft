@@ -31,7 +31,7 @@ function refreshWorlds() {
 
 function injectWorlds(data) {
   var row = $("#worlds-cards-row");
-  row.append(data);
+  alert(data);
 }
 
 })();
