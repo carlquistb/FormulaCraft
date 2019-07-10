@@ -22,7 +22,7 @@ function refreshWorlds() {
     }
   )
   .then(checkRequestStatus)
-  .then(json.parse)
+  .then(JSON.parse)
   .then(injectWorlds)
   .catch(alert);
 }
