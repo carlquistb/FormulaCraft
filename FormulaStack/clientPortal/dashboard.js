@@ -39,8 +39,8 @@ function checkRequestStatus(response) {
 
 function injectWorlds(data) {
 
-  var row = $("#worlds-cards-row");
-  row.innerHTML = JSON.stringify(data);
+  var row = document.getElementById("worlds-cards-row");
+  row.empty();
   alert(data.items.length);
 
   for(var i = 0; i < data.items.length; i++){
@@ -55,6 +55,8 @@ function injectWorlds(data) {
     cardHeader.classList.add("card-header");
     cardHeader.innerHTML = data.items[i].worldName;
     card.appendChild(cardHeader);
+
+    row.appendChild(column);
   }
 
 
