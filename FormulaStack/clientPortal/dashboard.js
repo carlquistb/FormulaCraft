@@ -40,7 +40,9 @@ function checkRequestStatus(response) {
 function injectWorlds(data) {
 
   var row = document.getElementById("worlds-cards-row");
-  row.empty();
+  while(row.firstChild) {
+    row.removeChild(row.firstChild);
+  }
   alert(data.items.length);
 
   for(var i = 0; i < data.items.length; i++){
