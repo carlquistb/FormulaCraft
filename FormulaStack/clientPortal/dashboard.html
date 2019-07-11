@@ -8,7 +8,7 @@
 
 	<meta charset="utf-8" />
 	<link rel="apple-touch-icon" sizes="76x76" href="observer.png" />
-	<link rel="icon" type="image/png" href="observer.png" />
+	<link rel="icon" type="image/png" href="Observer.png" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 
 	<title>Formula Craft: Client Portal</title>
@@ -187,13 +187,13 @@
 			<div class="content">
 				<div class="container-fluid">
 
-					<div class="row"> <!-- flavors header row -->
+					<div class="row" id="flavors-header-row">
 						<div class="col-lg-12">
 							<h4>Flavors <i id="refresh-flavors" class="material-icons">autorenew</i> </h4>
 						</div>
 					</div>
 
-					<div class="row" id="flavors-cards-row"> <!-- this is a row of cards representing each available flavor. -->
+					<div class="row" id="flavors-cards-row">
 						<!-- column for each card. -->
 						<div class="col-lg-4 col-md-6 col-sm-6">
 							<div class="card card-stats" >
@@ -241,43 +241,13 @@
 						</div>
 					</div>
 
-					<div class="row"> <!-- worlds header row -->
+					<div class="row" id="worlds-header-row">
 						<div class="col-lg-12">
 							<h4>Worlds <i id="refresh-worlds" class="material-icons">autorenew</i> </h4>
 						</div>
 					</div>
 
-					<div class="row" id="worlds-cards-row"> <!-- this is a row of cards representing each available world. -->
-						<!-- column for each card. -->
-						<div class="col-lg-4 col-md-6 col-sm-6">
-							<div class="card card-stats" >
-								<div class="card-header" data-background-color="white">
-									Tricities
-								</div>
-								<div class="card-content">
-									<p class="category">Flavor</p>
-									<p class="card-title">Vanilla village and pillage update<p>
-								</div>
-								<div class="card-footer">
-									<a>create stack with this world...<a/>
-								</div>
-							</div>
-						</div>
-						<!-- column for each card. -->
-						<div class="col-lg-4 col-md-6 col-sm-6">
-							<div class="card card-stats" >
-								<div class="card-header" data-background-color="white">
-									Tricities
-								</div>
-								<div class="card-content">
-									<p class="category">Flavor</p>
-									<p class="card-title">Vanilla village and pillage update<p>
-								</div>
-								<div class="card-footer">
-									<a>create stack with this world...<a/>
-								</div>
-							</div>
-						</div>
+					<div class="row" id="worlds-cards-row">
 						<!-- column for each card. -->
 						<div class="col-lg-4 col-md-6 col-sm-6">
 							<div class="card card-stats" >
@@ -299,46 +269,43 @@
 				</div>
 			</div>
 
+		  <footer class="footer">
+		    <div class="container-fluid">
+		        <nav class="pull-left">
+		            <ul>
+		                <li>
+		                    <a href="#">
+		                         Home
+		                    </a>
+		                </li>
+		                <li>
+		                    <a href="#">
+		                         Company
+		                    </a>
+		                </li>
+		                <li>
+		                    <a href="#">
+		                          Portofolio
+		                    </a>
+		                </li>
+		                <li>
+		                    <a href="#">
+		                        Blog
+		                    </a>
+		                </li>
+		            </ul>
+		        </nav>
+		        <p class="copyright pull-right">
+		            &copy;
+		            <script>document.write(new Date().getFullYear())</script>
+		            <a href="https://github.com/carlquistb/FormulaCraft"> Brendan Carlquist </a>
+		        </p>
+		    </div>
+		  </footer>
 
 
-
-  <footer class="footer">
-    <div class="container-fluid">
-        <nav class="pull-left">
-            <ul>
-                <li>
-                    <a href="#">
-                         Home
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                         Company
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                          Portofolio
-                    </a>
-                </li>
-                <li>
-                    <a href="#">
-                        Blog
-                    </a>
-                </li>
-            </ul>
-        </nav>
-        <p class="copyright pull-right">
-            &copy;
-            <script>document.write(new Date().getFullYear())</script>
-            <a href="https://github.com/carlquistb/FormulaCraft"> Brendan Carlquist </a>
-        </p>
-    </div>
-  </footer>
-
-
-		</div>
-	</div>
+		</div> <!-- main panel -->
+	</div> <!-- wrapper -->
 </body>
 
 <!--   Core JS Files   -->
