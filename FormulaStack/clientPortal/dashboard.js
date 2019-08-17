@@ -9,11 +9,21 @@ $("#refresh-worlds").click(refreshWorlds);
 //updates local cache for all data necessary for updating world display.
 //injects objects for worlds not currently displayed.
 function refreshWorlds() {
-  var button = this;
-  var ready = button.innerHTML;
-  this.innerHTML = "rowing";
-  fetchFlavors().then(fetchWorlds).then(injectWorlds).then(function() {
-    button.innerHTML = ready;
+  IconClickLoading(this, function(){
+    fetchFlavors().then(fetchWorlds).then(injectWorlds);
+  });
+}
+
+// Encapsulate your click function in this to implement a
+// "loading/rowing" icon while your function is active.
+//
+// ONLY for use with click listeners on material icons.
+function IconClickLoading(onclickThis, toDo) {
+  var element = onclickThis;
+  var original = element.innerHTML;
+  element.innerHTML = "rowing";
+  toDo().then(function() {
+    element.innerHTML = original;
   });
 }
 
