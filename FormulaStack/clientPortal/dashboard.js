@@ -22,9 +22,8 @@ function IconClickLoading(onclickThis, toDo) {
   var element = onclickThis;
   var original = element.innerHTML;
   element.innerHTML = "rowing";
-  toDo().then(function() {
-    element.innerHTML = original;
-  });
+  toDo();
+  element.innerHTML = original;s
 }
 
 //obtain new flavors data.
