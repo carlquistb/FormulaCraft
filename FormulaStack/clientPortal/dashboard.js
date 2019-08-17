@@ -9,7 +9,12 @@ $("#refresh-worlds").click(refreshWorlds);
 //updates local cache for all data necessary for updating world display.
 //injects objects for worlds not currently displayed.
 function refreshWorlds() {
-  fetchFlavors().then(fetchWorlds).then(injectWorlds);
+  var button = this;
+  var ready = button.innerHTML;
+  this.innerHTML = "rowing";
+  fetchFlavors().then(fetchWorlds).then(injectWorlds).then(function() {
+    button.innerHTML = ready;
+  });
 }
 
 //obtain new flavors data.
