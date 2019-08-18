@@ -5,6 +5,9 @@ const API_URL = "https://lt175p2wc6.execute-api.us-west-2.amazonaws.com/v0-1";
 //set onclick functions.
 $("#refresh-worlds").click(refreshWorlds);
 $("#refresh-flavors").click(refreshFlavors);
+$("#refresh-stacks").click(refreshStacks);
+
+//set onload function.
 $(document).ready(function() {
   injectWorlds();
   injectFlavors();
@@ -15,7 +18,7 @@ $(document).ready(function() {
 //injects objects for worlds not currently displayed.
 function refreshWorlds() {
   iconClickLoading(this, function(){
-    return fetchFlavors().then(fetchWorlds).then(injectWorlds);
+    return fetchWorlds().then(fetchWorlds).then(injectWorlds);
   });
 }
 
@@ -25,10 +28,17 @@ function refreshFlavors() {
   });
 }
 
+function refreshStacks() {
+  iconClickLoading(this, function() {
+    return fetchStacks().then(injectStacks);
+  });
+}
+
 // Encapsulate your click function in this to implement a
 // "loading/rowing" icon while your function is active.
 //
 // ONLY for use with click listeners on material icons.
+//toDo function needs to return a Promise.
 function iconClickLoading(onclickThis, toDo) {
   var element = onclickThis;
   var original = element.innerHTML;
@@ -36,6 +46,28 @@ function iconClickLoading(onclickThis, toDo) {
   toDo().then(function() {
     element.innerHTML = original;
   });
+}
+
+//obtain new stacks data.
+function fetchStacks() {
+  var url = API_URL + "/stacks";
+  var urlParams = "limit=5";
+  return fetch(
+    url+"?"+urlParams,
+    {
+      mode: "cors",
+      headers: {
+        "Access-Control-Allow-Origin":"*"
+      }
+    }
+  )
+  .then(checkRequestStatus)
+  .then(JSON.parse)
+  .then(function(data) {
+    localStorage.setItem("stacks",JSON.stringify(data.stacks));
+    return data;
+  })
+  .catch(alert);
 }
 
 //obtain new flavors data.
@@ -174,8 +206,8 @@ function injectWorlds() {
 }
 
 /*
-forms and injects DOM elements containing information on each world.
-removes and repopulates #worlds-cards-row.
+forms and injects DOM elements containing information on each flavor.
+removes and repopulates #flavors-cards-row.
 TODO: which is better, appendChild all at the end, or when the element is made?
 */
 function injectFlavors() {
@@ -242,6 +274,74 @@ function injectFlavors() {
         cardFooterLink.href = "blah"; //TODO: find syntax.
         cardFooterLink.appendChild(document.createTextNode(
           "create world with this flavor..."
+        ));
+        cardFooter.appendChild(cardFooterLink);
+  }
+}
+
+function injectStacks() {
+  var stacks = JSON.parse(localStorage.stacks);
+
+  //delete current HTML
+  var row = document.getElementById("stacks-cards-row");
+  while(row.firstChild) {
+    row.removeChild(row.firstChild);
+  }
+
+  //for each flavor object in localStorage array
+  for(var i = 0; i < stacks.length; i++) {
+
+    var stack = stacks[i];
+
+    //build new HTML
+    var column = document.createElement("div");
+    column.classList.add("col-lg-4","col-md-6","col-sm-6");
+    row.appendChild(column);
+
+    var card = document.createElement("div");
+    card.classList.add("card","card-stats");
+    column.appendChild(card);
+
+      var cardHeader = document.createElement("div");
+      cardHeader.classList.add("card-header");
+      cardHeader.setAttribute("data-background-color","white")
+      cardHeader.appendChild(document.createTextNode(stack.stackIps[0]));
+      card.appendChild(cardHeader);
+
+      var cardContent = document.createElement("div");
+      cardContent.classList.add("card-content");
+      card.appendChild(cardContent);
+
+        var cardContentCategory = document.createElement("p");
+        cardContentCategory.classList.add("category");
+        cardContentCategory.appendChild(document.createTextNode("World"));
+        cardContent.appendChild(cardContentCategory);
+
+        var cardContentTitle = document.createElement("p");
+        cardContentTitle.classList.add("card-title");
+        //TODO: find syntax.
+        cardContentTitle.appendChild(document.createTextNode(
+          "worldName"//TODO: implement.
+        ));
+        cardContent.appendChild(cardContentTitle);
+
+      var cardFooter = document.createElement("div");
+      cardFooter.classList.add("card-footer");
+      card.appendChild(cardFooter);
+
+        var cardFooterLink = document.createElement("a");
+        cardFooterLink.onclick = function() {
+          /*
+          createStackWithWorld(
+            world.worldName + "-" + getMonth() + "-" + getDate() + "-" + getYear(),  //stackName
+            world.s3Filepath,
+            flavor
+          )
+          */
+        };
+        cardFooterLink.href = "blah"; //TODO: find syntax.
+        cardFooterLink.appendChild(document.createTextNode(
+          "Created: " + stack.stackCreationTime
         ));
         cardFooter.appendChild(cardFooterLink);
   }
