@@ -5,6 +5,10 @@ const API_URL = "https://lt175p2wc6.execute-api.us-west-2.amazonaws.com/v0-1";
 //set onclick functions.
 $("#refresh-worlds").click(refreshWorlds);
 $("#refresh-flavors").click(refreshFlavors);
+$(document).ready(function() {
+  injectWorlds();
+  injectFlavors();
+});
 
 //onclick listener.
 //updates local cache for all data necessary for updating world display.
@@ -153,7 +157,7 @@ function injectWorlds() {
 
         var cardFooterLink = document.createElement("a");
         cardFooterLink.onclick = function() {
-          /*
+          /* TODO: create world...
           createStackWithWorld(
             world.worldName + "-" + getMonth() + "-" + getDate() + "-" + getYear(),  //stackName
             world.s3Filepath,
