@@ -1,7 +1,11 @@
 #!/bin/bash
 if [[ $# -eq 1 ]]
 then
-	aws s3 sync /home/ec2-user/mc/world "s3://bc-minecraft-repo/worlds/$1"
+	aws s3 sync /home/ec2-user/mc/world "$1/world"
+	for FILE_NAME in "banned-ips.json" "banned-players.json" "ops.json" "server.properties" "whitelist.json"
+	do
+		aws s3 cp "/home/ec2-user/mc/$FILE_NAME" "$1/serverdata/$FILE_NAME"
+	done
 else
-	echo "Usage $0 <aws world folder name>"
+	echo "Usage $0 <aws world folder url>"
 fi

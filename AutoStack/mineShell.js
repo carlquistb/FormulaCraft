@@ -28,7 +28,7 @@ const child = spawn('java', commandLineOpts, spawnOpts);
 function uploadWorld() {
 	log("Uploading world...");
 	execFile("/home/ec2-user/scripts/uploadworld", 
-	         ["world1"], 
+	         [instance_data["world_url"]], 
 	         function (error, stdout, stderr) {
 		if (error) {
 			log("Problem uploading world: " + error);

@@ -148,7 +148,7 @@ Resources:
                 -
                   - "#!/bin/bash\n"
                   - "cd /home/ec2-user\n"
-                  - "aws s3 cp s3://bc-minecraft-repo/configure-ec2 configure-ec2\n"
+                  - "aws s3 cp s3://bc-minecraft-repo/scripts/configure-ec2 configure-ec2\n"
                   - "chmod +x configure-ec2\n"
                   - "./configure-ec2 "
                   - !Ref MyWorld
