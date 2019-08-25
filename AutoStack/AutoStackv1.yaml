@@ -73,6 +73,11 @@ Resources:
             Resource:
               - "arn:aws:s3:::bc-minecraft-repo"
               - "arn:aws:s3:::*/*"
+          -
+            Effect: "Allow"
+            Action:
+              - "cloudformation:DeleteStack"
+            Resource: !Ref "AWS::StackId"
       Roles:
         -
           !Ref IAMRole
