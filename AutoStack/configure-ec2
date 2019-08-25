@@ -9,12 +9,10 @@ FLAVOR_URL=$2
 
 cd /home/ec2-user
 aws s3 sync $FLAVOR_URL mc
-aws s3 sync "$WORLD_URL/world" mc/world
+aws s3 sync "$WORLD_URL/serverdata/" mc
 
 aws s3 sync s3://bc-minecraft-repo/scripts scripts
 aws s3 sync s3://bc-minecraft-repo/service service
-
-aws s3 sync "$WORLD_URL/serverdata/" mc
 
 INSTANCE_TYPE=$(curl -s http://169.254.169.254/latest/meta-data/instance-type)
 

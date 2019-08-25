@@ -70,4 +70,4 @@ process.on("SIGTERM", function () {
 	child.stdin.write("stop\n");
 });
 
-var saveInterval = setInterval(uploadWorld,1000*60*15); //run the recurringSave method every 15 minutes.
+var saveInterval = setInterval(uploadWorld,1000*60*15); //run the uploadWorld method every 15 minutes.
