@@ -7,9 +7,14 @@ fi
 WORLD_URL=$1
 FLAVOR_URL=$2
 
+sudo yum install -y java python3 gcc-c++
+# This script adds the nodejs repository to yum
+curl -sL https://rpm.nodesource.com/setup_10.x | sudo -E bash -
+sudo yum install -y nodejs
+
 cd /home/ec2-user
 aws s3 sync $FLAVOR_URL mc
-aws s3 sync "$WORLD_URL/serverdata/" mc
+aws s3 sync $WORLD_URL mc
 
 aws s3 sync s3://bc-minecraft-repo/scripts scripts
 aws s3 sync s3://bc-minecraft-repo/service service

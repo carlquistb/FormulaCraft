@@ -140,7 +140,7 @@ Resources:
         LaunchSpecifications:
         - IamInstanceProfile:
             Arn: !GetAtt MyInstanceProfile.Arn
-          ImageId: 'ami-013c68f8dfa411f89'
+          ImageId: 'ami-082b5a644766e0e6f'
           UserData:
             Fn::Base64:
               Fn::Join:
