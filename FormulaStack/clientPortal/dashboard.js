@@ -48,6 +48,38 @@ function iconClickLoading(onclickThis, toDo) {
   });
 }
 
+//post a request to create a new stack.
+//@param stackName: A distinct name for the stack you want to create.
+//@param flavorS3Filepath: file path of the flavor you request to be ran.
+//@param worldS3Filepath: file path of the world you request to be ran.
+//@param instanceType: (String) instance type you request to be ran.
+
+function createStackWithWorld(stackName, flavorS3Filepath, worldS3Filepath, instanceType) {
+  var url = API_URL + "/stacks";
+  var urlParams = "stackName=" + stackName + "&"
+                + "flavorS3Filepath=" + flavorS3Filepath + "&"
+                + "worldS3Filepath=" + worldS3Filepath + "&"
+                + "instanceType=" + instanceType;
+  return fetch(
+    url + "?" + urlParams,
+    {
+      //fetch object
+      method: "POST",
+      mode: "cors",
+      headers: {
+        "Access-Control-Allow-Origin":"*"
+      }
+    }
+  )
+  .then(checkRequestStatus)
+  .then(JSON.parse)
+  .then(function(data){
+    //store data or update display?
+    alert(JSON.stringify(data))
+  })
+  .catch(alert);
+}
+
 //obtain new stacks data.
 function fetchStacks() {
   var url = API_URL + "/stacks";
@@ -189,15 +221,16 @@ function injectWorlds() {
 
         var cardFooterLink = document.createElement("a");
         cardFooterLink.onclick = function() {
-          /* TODO: create world...
+          alert(JSON.stringify(world));
+          alert(JSON.stringify(flavor));
           createStackWithWorld(
-            world.worldName + "-" + getMonth() + "-" + getDate() + "-" + getYear(),  //stackName
+            world.worldName + "-" + Date.now(),  //stackName
             world.s3Filepath,
-            flavor
-          )
-          */
+            flavor.s3Filepath,
+            "m5.large"
+
+          ).then(alert("done!"));
         };
-        cardFooterLink.href = "blah"; //TODO: find syntax.
         cardFooterLink.appendChild(document.createTextNode(
           "create stack with this world..."
         ));
