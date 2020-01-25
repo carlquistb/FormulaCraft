@@ -220,15 +220,22 @@ function injectWorlds() {
       card.appendChild(cardFooter);
 
         var cardFooterLink = document.createElement("a");
+        cardFooterLink.setAttribute("data-worldName", world.worldName);
+        cardFooterLink.setAttribute("data-worldS3Filepath", world.s3Filepath);
+        cardFooterLink.setAttribute("data-flavorS3Filepath", flavor.s3Filepath);
+        cardFooterLink.setAttribute("data-instanceType", "m5.large");
         cardFooterLink.onclick = function() {
-          alert(JSON.stringify(world));
-          alert(JSON.stringify(flavor));
+          alert(
+            this.getAttribute("data-worldName"),
+            this.getAttribute("data-worldS3Filepath"),
+            this.getAttribute("data-flavorS3Filepath"),
+            this.getAttribute("data-instanceType")
+          );
           createStackWithWorld(
-            world.worldName + "-" + Date.now(),  //stackName
-            world.s3Filepath,
-            flavor.s3Filepath,
-            "m5.large"
-
+            this.getAttribute("data-worldName") + "-" + Date.now(),  //stackName
+            this.getAttribute("data-worldS3Filepath"),
+            this.getAttribute("data-flavorS3Filepath"),
+            this.getAttribute("data-instanceType")
           ).then(alert("done!"));
         };
         cardFooterLink.appendChild(document.createTextNode(
