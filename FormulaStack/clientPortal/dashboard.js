@@ -11,6 +11,7 @@ $("#refresh-stacks").click(refreshStacks);
 $(document).ready(function() {
   injectWorlds();
   injectFlavors();
+  injectStacks();
 });
 
 //onclick listener.
