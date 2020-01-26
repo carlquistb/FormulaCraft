@@ -368,8 +368,13 @@ function injectStacks() {
 
       var cardHeader = document.createElement("div");
       cardHeader.classList.add("card-header");
-      cardHeader.setAttribute("data-background-color","white")
-      cardHeader.appendChild(document.createTextNode(stack.stackIps[0]));
+      cardHeader.setAttribute("data-background-color","white");
+      if(stack.stackIps) {
+        cardHeader.appendChild(document.createTextNode(stack.stackIps[0]));
+      } else {
+        cardHeader.appendChild(document.createTextNode(stack.stackStatus));
+      }
+
       card.appendChild(cardHeader);
 
       var cardContent = document.createElement("div");

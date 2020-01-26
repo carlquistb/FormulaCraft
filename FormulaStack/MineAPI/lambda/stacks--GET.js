@@ -9,9 +9,11 @@ output:
   {
     numStacks: int
     stacks: [
+      stackId: string
       stackName: string
       stackCreationTime: string
-      stackIPaddress: string
+      stackStatus: string
+      stackIPs: array [string]
     ]
   }
 
@@ -60,12 +62,13 @@ exports.handler = async (event, context, callback) => {
     let stacks = await Promise.all(listStacksData.StackSummaries.map(async function(summary) {
       //list stack resources
       console.log('logging id of each stack: ' + summary.StackId);
-      var stackIps = await getStackIps(summary.StackId);
+      var stackIps = await getStackIps(summary.StackId, summary.StackStatus);
       console.log("stackIps: ", stackIps);
       return {
         stackId: summary.StackId,
         stackName: summary.StackName,
         stackCreationTime: summary.CreationTime,
+        stackStatus: summary.StackStatus,
         stackIps: stackIps
       };
     }));
@@ -95,7 +98,13 @@ exports.handler = async (event, context, callback) => {
 }
 
 //returns array of Strings representing public ipv4 addresses for the stack.
-async function getStackIps(stackId) {
+async function getStackIps(stackId, stackStatus) {
+
+  //ONLY attempt to fetch IPs of currently active stacks.
+  if(stackStatus != "CREATE_COMPLETE") {
+    return (null);
+  }
+
   let listStackResourcesParams = {
     StackName: stackId
   };
@@ -122,6 +131,11 @@ async function getStackIps(stackId) {
     return;
   }
 
+  if(spotfleets.length < 1) {
+    console.log("ERROR: stack contains less than one spotfleet resource. Each stack is expected to have a single spotfleet resource.");
+    return;
+  }
+
   let spotfleet = spotfleets[0];
 
   //get the ips of all instances (expected: 1) in the spotfleet
@@ -140,6 +154,11 @@ async function getStackIps(stackId) {
     return;
   }
 
+  if(describeSpotFleetInstancesData.ActiveInstances.length != 1) {
+    console.log("ERROR: spotfleet contains " + describeSpotFleetInstancesData.ActiveInstances.length + "instances. Each spotfleet is expected to have a single instance.");
+    return;
+  }
+
   var describeInstancesparams = {
       InstanceIds: [describeSpotFleetInstancesData.ActiveInstances[0].InstanceId]
   };
@@ -155,8 +174,8 @@ async function getStackIps(stackId) {
 
   var ips = describeInstancesData.Reservations[0].Instances.map(function(instance) {return instance.PublicIpAddress;});
 
-  console.log("logging ips");
-  console.log("ips:",ips);
+  console.log("logging ip");
+  console.log("ip:",ips[0]);
 
   return(ips);
 }
