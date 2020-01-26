@@ -54,6 +54,30 @@ function iconClickLoading(onclickThis, toDo) {
 //@param worldS3Filepath: file path of the world you request to be ran.
 //@param instanceType: (String) instance type you request to be ran.
 
+function deleteStack(stackName) {
+  var url = API_URL + "/stacks";
+  var urlParams = "stackName=" + stackName;
+
+  return fetch(
+    url + "?" + urlParams,
+    {
+      //fetch object
+      method: "DELETE",
+      mode: "cors",
+      headers: {
+        "Access-Control-Allow-Origin":"*"
+      }
+    }
+  )
+  .then(checkRequestStatus)
+  .then(JSON.parse)
+  .then(function(data) {
+    //store data or update display?
+    alert(JSON.stringify(data));
+  })
+  .catch(alert);
+}
+
 function createStackWithWorld(stackName, flavorS3Filepath, worldS3Filepath, instanceType) {
   var url = API_URL + "/stacks";
   var urlParams = "stackName=" + stackName + "&"
@@ -370,18 +394,12 @@ function injectStacks() {
       card.appendChild(cardFooter);
 
         var cardFooterLink = document.createElement("a");
+        cardFooterLink.setAttribute("data-stackName", stack.stackName);
         cardFooterLink.onclick = function() {
-          /*
-          createStackWithWorld(
-            world.worldName + "-" + getMonth() + "-" + getDate() + "-" + getYear(),  //stackName
-            world.s3Filepath,
-            flavor
-          )
-          */
+          deleteStack(this.getAttribute("data-stackName"));
         };
-        cardFooterLink.href = "blah"; //TODO: find syntax.
         cardFooterLink.appendChild(document.createTextNode(
-          "Created: " + stack.stackCreationTime
+          "Created: " + stack.stackCreationTime + "\n click here to delete"
         ));
         cardFooter.appendChild(cardFooterLink);
   }
