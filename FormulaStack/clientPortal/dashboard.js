@@ -79,7 +79,7 @@ function deleteStack(stackName) {
   .catch(alert);
 }
 
-function createStackWithWorld(stackName, flavorS3Filepath, worldS3Filepath, instanceType) {
+function createStackWithWorld(stackName, worldS3Filepath, flavorS3Filepath, instanceType) {
   var url = API_URL + "/stacks";
   var urlParams = "stackName=" + stackName + "&"
                 + "flavorS3Filepath=" + flavorS3Filepath + "&"
