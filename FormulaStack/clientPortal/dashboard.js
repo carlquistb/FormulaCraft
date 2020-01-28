@@ -41,8 +41,8 @@ function refreshStacks() {
 // ONLY for use with click listeners on material icons.
 //toDo function needs to return a Promise.
 function iconClickLoading(onclickThis, toDo) {
-  var element = onclickThis;
-  var original = element.innerHTML;
+  let element = onclickThis;
+  let original = element.innerHTML;
   element.innerHTML = "rowing";
   toDo().then(function() {
     element.innerHTML = original;
@@ -56,8 +56,8 @@ function iconClickLoading(onclickThis, toDo) {
 //@param instanceType: (String) instance type you request to be ran.
 
 function deleteStack(stackName) {
-  var url = API_URL + "/stacks";
-  var urlParams = "stackName=" + stackName;
+  let url = API_URL + "/stacks";
+  let urlParams = "stackName=" + stackName;
 
   return fetch(
     url + "?" + urlParams,
@@ -80,8 +80,8 @@ function deleteStack(stackName) {
 }
 
 function createStackWithWorld(stackName, worldS3Filepath, flavorS3Filepath, instanceType) {
-  var url = API_URL + "/stacks";
-  var urlParams = "stackName=" + stackName + "&"
+  let url = API_URL + "/stacks";
+  let urlParams = "stackName=" + stackName + "&"
                 + "flavorS3Filepath=" + flavorS3Filepath + "&"
                 + "worldS3Filepath=" + worldS3Filepath + "&"
                 + "instanceType=" + instanceType;
@@ -107,8 +107,8 @@ function createStackWithWorld(stackName, worldS3Filepath, flavorS3Filepath, inst
 
 //obtain new stacks data.
 function fetchStacks() {
-  var url = API_URL + "/stacks";
-  var urlParams = "limit=5";
+  let url = API_URL + "/stacks";
+  let urlParams = "limit=5";
   return fetch(
     url+"?"+urlParams,
     {
@@ -129,8 +129,8 @@ function fetchStacks() {
 
 //obtain new flavors data.
 function fetchFlavors() {
-  var url = API_URL + "/flavors";
-  var urlParams = "limit=5";
+  let url = API_URL + "/flavors";
+  let urlParams = "limit=5";
   return fetch(
     url+"?"+urlParams,
     {
@@ -152,8 +152,8 @@ function fetchFlavors() {
 //obtain new worlds data.
 function fetchWorlds() {
 
-  var url = API_URL + "/worlds";
-  var urlParams = "limit=5";
+  let url = API_URL + "/worlds";
+  let urlParams = "limit=5";
   return fetch(
     url+"?"+urlParams,
     {
@@ -193,46 +193,46 @@ TODO: which is better, appendChild all at the end, or when the element is made?
 */
 function injectWorlds() {
 
-  var worlds = JSON.parse(localStorage.worlds);
-  var flavors = JSON.parse(localStorage.flavors);
+  let worlds = JSON.parse(localStorage.worlds);
+  let flavors = JSON.parse(localStorage.flavors);
 
   //delete current HTML
-  var row = document.getElementById("worlds-cards-row");
+  let row = document.getElementById("worlds-cards-row");
   while(row.firstChild) {
     row.removeChild(row.firstChild);
   }
 
   //for each world object in localStorage array
-  for(var i = 0; i < worlds.length; i++) {
+  for(let i = 0; i < worlds.length; i++) {
     //find the flavor details
-    var world = worlds[i];
-    var flavor = flavors.find(i => i.flavorID === world.flavorID);
+    let world = worlds[i];
+    let flavor = flavors.find(i => i.flavorID === world.flavorID);
 
     //build new HTML
-    var column = document.createElement("div");
+    let column = document.createElement("div");
     column.classList.add("col-lg-4","col-md-6","col-sm-6");
     row.appendChild(column);
 
-    var card = document.createElement("div");
+    let card = document.createElement("div");
     card.classList.add("card","card-stats");
     column.appendChild(card);
 
-      var cardHeader = document.createElement("div");
+      let cardHeader = document.createElement("div");
       cardHeader.classList.add("card-header");
       cardHeader.setAttribute("data-background-color","white")
       cardHeader.appendChild(document.createTextNode(world.worldName));
       card.appendChild(cardHeader);
 
-      var cardContent = document.createElement("div");
+      let cardContent = document.createElement("div");
       cardContent.classList.add("card-content");
       card.appendChild(cardContent);
 
-        var cardContentCategory = document.createElement("p");
+        let cardContentCategory = document.createElement("p");
         cardContentCategory.classList.add("category");
         cardContentCategory.appendChild(document.createTextNode("Flavor"));
         cardContent.appendChild(cardContentCategory);
 
-        var cardContentTitle = document.createElement("p");
+        let cardContentTitle = document.createElement("p");
         cardContentTitle.classList.add("card-title");
         //TODO: find syntax.
         cardContentTitle.appendChild(document.createTextNode(
@@ -240,11 +240,11 @@ function injectWorlds() {
         ));
         cardContent.appendChild(cardContentTitle);
 
-      var cardFooter = document.createElement("div");
+      let cardFooter = document.createElement("div");
       cardFooter.classList.add("card-footer");
       card.appendChild(cardFooter);
 
-        var cardFooterLink = document.createElement("a");
+        let cardFooterLink = document.createElement("a");
         cardFooterLink.setAttribute("data-worldName", world.worldName);
         cardFooterLink.setAttribute("data-worldS3Filepath", world.s3Filepath);
         cardFooterLink.setAttribute("data-flavorS3Filepath", flavor.s3Filepath);
@@ -277,44 +277,44 @@ TODO: which is better, appendChild all at the end, or when the element is made?
 */
 function injectFlavors() {
 
-  var flavors = JSON.parse(localStorage.flavors);
+  let flavors = JSON.parse(localStorage.flavors);
 
   //delete current HTML
-  var row = document.getElementById("flavors-cards-row");
+  let row = document.getElementById("flavors-cards-row");
   while(row.firstChild) {
     row.removeChild(row.firstChild);
   }
 
   //for each flavor object in localStorage array
-  for(var i = 0; i < flavors.length; i++) {
+  for(let i = 0; i < flavors.length; i++) {
 
-    var flavor = flavors[i];
+    let flavor = flavors[i];
 
     //build new HTML
-    var column = document.createElement("div");
+    let column = document.createElement("div");
     column.classList.add("col-lg-4","col-md-6","col-sm-6");
     row.appendChild(column);
 
-    var card = document.createElement("div");
+    let card = document.createElement("div");
     card.classList.add("card","card-stats");
     column.appendChild(card);
 
-      var cardHeader = document.createElement("div");
+      let cardHeader = document.createElement("div");
       cardHeader.classList.add("card-header");
       cardHeader.setAttribute("data-background-color","white")
       cardHeader.appendChild(document.createTextNode(flavor.flavorDescription));
       card.appendChild(cardHeader);
 
-      var cardContent = document.createElement("div");
+      let cardContent = document.createElement("div");
       cardContent.classList.add("card-content");
       card.appendChild(cardContent);
 
-        var cardContentCategory = document.createElement("p");
+        let cardContentCategory = document.createElement("p");
         cardContentCategory.classList.add("category");
         cardContentCategory.appendChild(document.createTextNode("MC version"));
         cardContent.appendChild(cardContentCategory);
 
-        var cardContentTitle = document.createElement("p");
+        let cardContentTitle = document.createElement("p");
         cardContentTitle.classList.add("card-title");
         //TODO: find syntax.
         cardContentTitle.appendChild(document.createTextNode(
@@ -322,17 +322,15 @@ function injectFlavors() {
         ));
         cardContent.appendChild(cardContentTitle);
 
-      var cardFooter = document.createElement("div");
+      let cardFooter = document.createElement("div");
       cardFooter.classList.add("card-footer");
       card.appendChild(cardFooter);
 
-        var cardFooterLink = document.createElement("a");
+        let cardFooterLink = document.createElement("a");
         cardFooterLink.onclick = function() {
           /*
-          createStackWithWorld(
-            world.worldName + "-" + getMonth() + "-" + getDate() + "-" + getYear(),  //stackName
-            world.s3Filepath,
-            flavor
+          createWorldWithFlavor(
+            //worldname
           )
           */
         };
@@ -345,10 +343,10 @@ function injectFlavors() {
 }
 
 function injectStacks() {
-  var stacks = JSON.parse(localStorage.stacks);
+  let stacks = JSON.parse(localStorage.stacks);
 
   //delete current HTML
-  var row = document.getElementById("stacks-cards-row");
+  let row = document.getElementById("stacks-cards-row");
   while(row.firstChild) {
     row.removeChild(row.firstChild);
   }
@@ -356,18 +354,18 @@ function injectStacks() {
   //for each flavor object in localStorage array
   for(var i = 0; i < stacks.length; i++) {
 
-    var stack = stacks[i];
+    let stack = stacks[i];
 
     //build new HTML
-    var column = document.createElement("div");
+    let column = document.createElement("div");
     column.classList.add("col-lg-4","col-md-6","col-sm-6");
     row.appendChild(column);
 
-    var card = document.createElement("div");
+    let card = document.createElement("div");
     card.classList.add("card","card-stats");
     column.appendChild(card);
 
-      var cardHeader = document.createElement("div");
+      let cardHeader = document.createElement("div");
       cardHeader.classList.add("card-header");
       cardHeader.setAttribute("data-background-color","white");
       if(stack.stackIps) {
@@ -378,16 +376,16 @@ function injectStacks() {
 
       card.appendChild(cardHeader);
 
-      var cardContent = document.createElement("div");
+      let cardContent = document.createElement("div");
       cardContent.classList.add("card-content");
       card.appendChild(cardContent);
 
-        var cardContentCategory = document.createElement("p");
+        let cardContentCategory = document.createElement("p");
         cardContentCategory.classList.add("category");
         cardContentCategory.appendChild(document.createTextNode("World"));
         cardContent.appendChild(cardContentCategory);
 
-        var cardContentTitle = document.createElement("p");
+        let cardContentTitle = document.createElement("p");
         cardContentTitle.classList.add("card-title");
         //TODO: find syntax.
         cardContentTitle.appendChild(document.createTextNode(
@@ -395,11 +393,11 @@ function injectStacks() {
         ));
         cardContent.appendChild(cardContentTitle);
 
-      var cardFooter = document.createElement("div");
+      let cardFooter = document.createElement("div");
       cardFooter.classList.add("card-footer");
       card.appendChild(cardFooter);
 
-        var cardFooterLink = document.createElement("a");
+        let cardFooterLink = document.createElement("a");
         cardFooterLink.setAttribute("data-stackName", stack.stackName);
         cardFooterLink.onclick = function() {
           deleteStack(this.getAttribute("data-stackName"));
