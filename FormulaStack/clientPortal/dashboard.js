@@ -234,7 +234,6 @@ function injectWorlds() {
 
         let cardContentTitle = document.createElement("p");
         cardContentTitle.classList.add("card-title");
-        //TODO: find syntax.
         cardContentTitle.appendChild(document.createTextNode(
           flavor.flavorDescription
         ));
@@ -249,7 +248,18 @@ function injectWorlds() {
         cardFooterLink.setAttribute("data-worldS3Filepath", world.s3Filepath);
         cardFooterLink.setAttribute("data-flavorS3Filepath", flavor.s3Filepath);
         cardFooterLink.setAttribute("data-instanceType", "m5.large");
-        cardFooterLink.onclick = function() {
+        cardFooterLink.appendChild(document.createTextNode(
+          "create stack with this world...\t"
+        ));
+        cardFooter.appendChild(cardFooterLink);
+
+        //small link
+        let cardFooterLinkSmall = document.createElement("a");
+        cardFooterLinkSmall.setAttribute("data-worldName", world.worldName);
+        cardFooterLinkSmall.setAttribute("data-worldS3Filepath", world.s3Filepath);
+        cardFooterLinkSmall.setAttribute("data-flavorS3Filepath", flavor.s3Filepath);
+        cardFooterLinkSmall.setAttribute("data-instanceType", "m5.large");
+        cardFooterLinkSmall.onclick = function() {
           alert(
             this.getAttribute("data-worldName"),
             this.getAttribute("data-worldS3Filepath"),
@@ -263,10 +273,61 @@ function injectWorlds() {
             this.getAttribute("data-instanceType")
           ).then(alert("done!"));
         };
-        cardFooterLink.appendChild(document.createTextNode(
-          "create stack with this world..."
+        cardFooterLinkSmall.appendChild(document.createTextNode(
+          "small "
         ));
-        cardFooter.appendChild(cardFooterLink);
+        cardFooter.appendChild(cardFooterLinkSmall);
+
+        //medium link
+        let cardFooterLinkMedium = document.createElement("a");
+        cardFooterLinkMedium.setAttribute("data-worldName", world.worldName);
+        cardFooterLinkMedium.setAttribute("data-worldS3Filepath", world.s3Filepath);
+        cardFooterLinkMedium.setAttribute("data-flavorS3Filepath", flavor.s3Filepath);
+        cardFooterLinkMedium.setAttribute("data-instanceType", "r5.large");
+        cardFooterLinkMedium.onclick = function() {
+          alert(
+            this.getAttribute("data-worldName"),
+            this.getAttribute("data-worldS3Filepath"),
+            this.getAttribute("data-flavorS3Filepath"),
+            this.getAttribute("data-instanceType")
+          );
+          createStackWithWorld(
+            this.getAttribute("data-worldName") + "-" + Date.now(),  //stackName
+            this.getAttribute("data-worldS3Filepath"),
+            this.getAttribute("data-flavorS3Filepath"),
+            this.getAttribute("data-instanceType")
+          ).then(alert("done!"));
+        };
+        cardFooterLinkMedium.appendChild(document.createTextNode(
+          "medium "
+        ));
+        cardFooter.appendChild(cardFooterLinkMedium);
+
+        //large link
+        let cardFooterLinklarge = document.createElement("a");
+        cardFooterLinklarge.setAttribute("data-worldName", world.worldName);
+        cardFooterLinklarge.setAttribute("data-worldS3Filepath", world.s3Filepath);
+        cardFooterLinklarge.setAttribute("data-flavorS3Filepath", flavor.s3Filepath);
+        cardFooterLinklarge.setAttribute("data-instanceType", "m5.xlarge");
+        cardFooterLinklarge.onclick = function() {
+          alert(
+            this.getAttribute("data-worldName"),
+            this.getAttribute("data-worldS3Filepath"),
+            this.getAttribute("data-flavorS3Filepath"),
+            this.getAttribute("data-instanceType")
+          );
+          createStackWithWorld(
+            this.getAttribute("data-worldName") + "-" + Date.now(),  //stackName
+            this.getAttribute("data-worldS3Filepath"),
+            this.getAttribute("data-flavorS3Filepath"),
+            this.getAttribute("data-instanceType")
+          ).then(alert("done!"));
+        };
+        cardFooterLinklarge.appendChild(document.createTextNode(
+          "large "
+        ));
+        cardFooter.appendChild(cardFooterLinklarge);
+
   }
 }
 
@@ -316,7 +377,6 @@ function injectFlavors() {
 
         let cardContentTitle = document.createElement("p");
         cardContentTitle.classList.add("card-title");
-        //TODO: find syntax.
         cardContentTitle.appendChild(document.createTextNode(
           flavor.minecraftVersion
         ));
@@ -334,7 +394,6 @@ function injectFlavors() {
           )
           */
         };
-        cardFooterLink.href = "blah"; //TODO: find syntax.
         cardFooterLink.appendChild(document.createTextNode(
           "create world with this flavor..."
         ));
