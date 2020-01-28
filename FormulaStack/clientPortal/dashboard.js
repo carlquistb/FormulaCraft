@@ -382,14 +382,13 @@ function injectStacks() {
 
         let cardContentCategory = document.createElement("p");
         cardContentCategory.classList.add("category");
-        cardContentCategory.appendChild(document.createTextNode("World"));
+        cardContentCategory.appendChild(document.createTextNode("Stack"));
         cardContent.appendChild(cardContentCategory);
 
         let cardContentTitle = document.createElement("p");
         cardContentTitle.classList.add("card-title");
-        //TODO: find syntax.
         cardContentTitle.appendChild(document.createTextNode(
-          "worldName"//TODO: implement.
+          stack.stackName
         ));
         cardContent.appendChild(cardContentTitle);
 
