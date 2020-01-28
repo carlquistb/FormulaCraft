@@ -26,11 +26,11 @@ if [[ "$INSTANCE_TYPE" = "t3.micro" ]]; then
 elif [[ "$INSTANCE_TYPE" = "m5.large" ]]; then
 	AVAILABLE_RAM=7G
 elif [[ "$INSTANCE_TYPE" = "r5.large" ]]; then
-	AVAILABLE_RAM=15G
+	AVAILABLE_RAM=14G
 elif [[ "$INSTANCE_TYPE" = "m5.xlarge" ]]; then
-	AVAILABLE_RAM=15G
+	AVAILABLE_RAM=14G
 elif [[ "$INSTANCE_TYPE" = "r5.xlarge" ]]; then
-	AVAILABLE_RAM=31G
+	AVAILABLE_RAM=28G
 fi
 
 if [[ -z "$AVAILABLE_RAM" ]]; then
@@ -39,8 +39,8 @@ if [[ -z "$AVAILABLE_RAM" ]]; then
 fi
 
 echo "{" > scripts/instance_data.json
-echo "\"available_ram\":\"$AVAILABLE_RAM\"," >> scripts/instance_data.json 
-echo "\"world_url\":\"$WORLD_URL\"" >> scripts/instance_data.json 
+echo "\"available_ram\":\"$AVAILABLE_RAM\"," >> scripts/instance_data.json
+echo "\"world_url\":\"$WORLD_URL\"" >> scripts/instance_data.json
 echo "}" >> scripts/instance_data.json
 
 chmod +x /home/ec2-user/scripts/uploadworld
