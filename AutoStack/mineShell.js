@@ -1,6 +1,6 @@
 /*
 	Project: FormulaCraft
-	
+
 	mineShell is a Node script that will be executed by the userdata of ec2 instances brought online by the AutoStack Cloudformation stack.
 
 	this utilizes the a child process to run Minecraft Server inside this script.
@@ -8,7 +8,7 @@
 	This script will handle boot up and boot down of the .jar file.
 
 	This script will not handle boot up and boot down of autoStacks.
-	
+
 
 */
 //load libraries
@@ -27,8 +27,8 @@ const child = spawn('java', commandLineOpts, spawnOpts);
 
 function uploadWorld() {
 	log("Uploading world...");
-	execFile("/home/ec2-user/scripts/uploadworld", 
-	         [instance_data["world_url"]], 
+	execFile("/home/ec2-user/scripts/uploadworld",
+	         [instance_data["world_url"]],
 	         function (error, stdout, stderr) {
 		if (error) {
 			log("Problem uploading world: " + error);
@@ -54,6 +54,9 @@ streamWatcher.addOnExit(function () {
 
 let regex42 = /the answer is 42/;
 let regexHelp = /I need help/;
+let regexOP = /give ([\S]*) the power/;
+let regexDEOP = /take the power from ([/S]*)/;
+let regexSave = /supersave/;
 
 streamWatcher.addWatcher(regex42, function (stdin, regexData) {
 	stdin.write("stop\n");
@@ -61,6 +64,41 @@ streamWatcher.addWatcher(regex42, function (stdin, regexData) {
 
 streamWatcher.addWatcher(regexHelp, function (stdin, regexData) {
 	stdin.write("say your wish is my command\n");
+});
+
+streamWatcher.addWatcher(regexOP, function (stdin, regexData) {
+	if(regexData.length < 1) {
+		stdin.write("say who said that?\n");
+		log("regexOP unable to capture player name.");
+	}
+	else {
+		log("player name: " + regexData[1]);
+		stdin.write("deop " + regexData[1] + "\n"); //regexData[1] = first parenthesized result, the player name.
+		stdin.write("tell " + regexData[1] + "you have lost the power\n");
+	}
+});
+
+streamWatcher.addWatcher(regexDEOP, function (stdin, regexData) {
+	if(regexData.length < 1) {
+		stdin.write("say who said that?\n");
+		log("regexDEOP unable to capture player name.");
+	}
+	else {
+		log("player name: " + regexData[1]);
+		stdin.write("op " + regexData[1] + "\n"); //regexData[1] = first parenthesized result, the player name.
+		stdin.write("tell " + regexData[1] + "you have the power\n");
+	}
+});
+
+streamWatcher.addWatcher(regexSave, function (stdin, regexData) {
+	log("player initiated save");
+	stdin.write("save-all\n"); //regexData[1] = first parenthesized result, the player name.
+	stdin.write("say local save initiated\n");
+	// I am using a 5 second timeout for right now, but I think we can implement this with a second watcher that waits for the save to be completed.
+	setTimeout(function() {
+		uploadWorld();
+		stdin.write("say cloud save initiated\n");
+	}, 5000);
 });
 
 // The SIGTERM event will be sent by systemctl when the service is stopped
