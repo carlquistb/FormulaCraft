@@ -1,11 +1,12 @@
 #!/bin/bash
-if [[ $# -ne 2 ]]; then
-	echo "Usage: $0 <s3 world url> <s3 flavor url>" > error.log
+if [[ $# -ne 3 ]]; then
+	echo "Usage: $0 <s3 world url> <s3 flavor url> <Cloudformation StackName" > error.log
 	exit
 fi
 
 WORLD_URL=$1
 FLAVOR_URL=$2
+STACK_NAME=$3
 
 sudo yum install -y java python3 gcc-c++
 # This script adds the nodejs repository to yum
@@ -41,9 +42,11 @@ fi
 echo "{" > scripts/instance_data.json
 echo "\"available_ram\":\"$AVAILABLE_RAM\"," >> scripts/instance_data.json
 echo "\"world_url\":\"$WORLD_URL\"" >> scripts/instance_data.json
+echo "\"stack_name\":\"$STACK_NAME\"" >> scripts/instance_data.json
 echo "}" >> scripts/instance_data.json
 
 chmod +x /home/ec2-user/scripts/uploadworld
+chmod +x /home/ec2-user/scripts/closestack
 
 cp service/mineService.service /etc/systemd/system/mineService.service
 systemctl start mineService
