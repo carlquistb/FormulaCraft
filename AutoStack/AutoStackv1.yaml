@@ -159,6 +159,8 @@ Resources:
                   - !Ref MyWorld
                   - " "
                   - !Ref MyFlavor
+                  - " "
+                  - !Ref AWS::StackName
                   - "\n"
           InstanceType: !Ref MyInstanceType
           KeyName: !Ref MyKeyPair
