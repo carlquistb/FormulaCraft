@@ -38,6 +38,19 @@ function uploadWorld() {
 	});
 }
 
+function closeStack() {
+	log("closing stack...");
+	execFile("/home/ec2-user/scripts/closestack",
+					[instance_data["stack_name"]],
+					function (error, stdout, stderr) {
+		if(error) {
+			log("problem closing stack:" + error);
+		} else if (stderr.length != 0) {
+			log("Error while closing stack: " + stderr);
+		}
+	});
+}
+
 function log(str) {
 	console.log("[mineShell] " + str);
 }
@@ -57,6 +70,7 @@ let regexHelp = /I need help/;
 let regexOP = /give ([\S]*) the power/;
 let regexDEOP = /take the power from ([/S]*)/;
 let regexSave = /supersave/;
+let regexClose = /shut it down!!!/;
 
 streamWatcher.addWatcher(regex42, function (stdin, regexData) {
 	stdin.write("stop\n");
@@ -92,13 +106,18 @@ streamWatcher.addWatcher(regexDEOP, function (stdin, regexData) {
 
 streamWatcher.addWatcher(regexSave, function (stdin, regexData) {
 	log("player initiated save");
-	stdin.write("save-all\n"); //regexData[1] = first parenthesized result, the player name.
+	stdin.write("save-all\n");
 	stdin.write("say local save initiated\n");
 	// I am using a 5 second timeout for right now, but I think we can implement this with a second watcher that waits for the save to be completed.
 	setTimeout(function() {
 		uploadWorld();
 		stdin.write("say cloud save initiated\n");
 	}, 5000);
+});
+
+streamWatcher.addWatcher(regexClose, function (stdin, regexData) {
+	stdin.write("say This server is shutting down! Evacuate! Burn the diamonds!");
+	closeStack();
 });
 
 // The SIGTERM event will be sent by systemctl when the service is stopped
