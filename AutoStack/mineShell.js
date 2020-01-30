@@ -106,8 +106,8 @@ streamWatcher.addWatcher(regexDEOP, function (stdin, regexData) {
 
 streamWatcher.addWatcher(regexSave, function (stdin, regexData) {
 	log("player initiated save");
-	stdin.write("save-all\n");
 	stdin.write("say local save initiated\n");
+	stdin.write("save-all\n");
 	// I am using a 5 second timeout for right now, but I think we can implement this with a second watcher that waits for the save to be completed.
 	setTimeout(function() {
 		uploadWorld();
