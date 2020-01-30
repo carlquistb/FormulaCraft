@@ -116,7 +116,7 @@ streamWatcher.addWatcher(regexSave, function (stdin, regexData) {
 });
 
 streamWatcher.addWatcher(regexClose, function (stdin, regexData) {
-	stdin.write("say This server is shutting down! Evacuate! Burn the diamonds!");
+	stdin.write("say This server is shutting down! Evacuate! Burn the diamonds!\n");
 	closeStack();
 });
 
