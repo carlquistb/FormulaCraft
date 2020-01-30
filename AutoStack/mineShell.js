@@ -44,7 +44,7 @@ function closeStack() {
 					[instance_data["stack_name"]],
 					function (error, stdout, stderr) {
 		if(error) {
-			log("problem closing stack:" + error);
+			log("problem closing stack: " + error);
 		} else if (stderr.length != 0) {
 			log("Error while closing stack: " + stderr);
 		}
@@ -87,8 +87,8 @@ streamWatcher.addWatcher(regexOP, function (stdin, regexData) {
 	}
 	else {
 		log("player name: " + regexData[1]);
-		stdin.write("deop " + regexData[1] + "\n"); //regexData[1] = first parenthesized result, the player name.
-		stdin.write("tell " + regexData[1] + "you have lost the power\n");
+		stdin.write("op " + regexData[1] + "\n"); //regexData[1] = first parenthesized result, the player name.
+		stdin.write("tell " + regexData[1] + "you have the power\n");
 	}
 });
 
@@ -99,8 +99,8 @@ streamWatcher.addWatcher(regexDEOP, function (stdin, regexData) {
 	}
 	else {
 		log("player name: " + regexData[1]);
-		stdin.write("op " + regexData[1] + "\n"); //regexData[1] = first parenthesized result, the player name.
-		stdin.write("tell " + regexData[1] + "you have the power\n");
+		stdin.write("deop " + regexData[1] + "\n"); //regexData[1] = first parenthesized result, the player name.
+		stdin.write("tell " + regexData[1] + "you have lost the power\n");
 	}
 });
 
