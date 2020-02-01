@@ -49,49 +49,51 @@ exports.handler = (event, context, callback) => {
     };
 
     console.log('executing CreateStack');
-    cfn.createStack(params, () => stackHandler(paramsm, callback));
-};
+    cfn.createStack(params, function(err, data) {
+      if(err) {
+        console.log(err,err.stack);
+        console.log(params);
 
-function stackHandler(params, callback) {
-  if(err) {
-    console.log(err,err.stack);
-    console.log(params);
+        //define and return response
 
-    //define and return response
+        let response = {
+            isBase64Encoded: true,
+            statusCode: 400,
+            headers: {
+              "x-custom-header" : "my custom header value",
+              'Access-Control-Allow-Origin':'*',
+              "Content-Type" : "application/json"
+            },
+            body: JSON.stringify({})
+        };
 
-    let response = {
-        isBase64Encoded: true,
-        statusCode: 400,
-        headers: {
-          "x-custom-header" : "my custom header value",
-          'Access-Control-Allow-Origin':'*',
-          "Content-Type" : "application/json"
-        },
-        body: JSON.stringify({})
-    };
+        callback(err, response);
+      }
+      else { //method success callback fn
+        console.log(data);
+        console.log(params);
 
-    callback(err, response);
-  }
-  else { //method success callback fn
-    console.log(data);
-    console.log(params);
+        //define and return HTTP response
 
-    //define and return HTTP response
+        let body = data;
+        body.stackName = event.queryStringParameters.stackName;
 
-    let body = data;
-    body.stackName = event.queryStringParameters.stackName;
+        const response = {
+            isBase64Encoded: true,
+            statusCode: 200,
+            headers: {
+              "x-custom-header" : "my custom header value",
+              'Access-Control-Allow-Origin':'*',
+              "Content-Type" : "application/json"
+            },
+            body: JSON.stringify(body)
+        };
 
-    const response = {
-        isBase64Encoded: true,
-        statusCode: 200,
-        headers: {
-          "x-custom-header" : "my custom header value",
-          'Access-Control-Allow-Origin':'*',
-          "Content-Type" : "application/json"
-        },
-        body: JSON.stringify(body)
-    };
+        callback(null, response);
+      }
+    });
 
-    callback(null, response);
-  }
+
+
+
 };
