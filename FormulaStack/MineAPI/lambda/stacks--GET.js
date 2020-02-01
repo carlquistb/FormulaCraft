@@ -131,8 +131,7 @@ async function getStackIps(stackId, stackStatus) {
   });
 
   if(spotfleets.length > 1) {
-    console.log(
-    	"ERROR: stack contains more than one spotfleet resource. Each stack is expected to have a single spotfleet resource.");
+    console.log("ERROR: stack contains more than one spotfleet resource. Each stack is expected to have a single spotfleet resource.");
     return;
   }
 
