@@ -59,19 +59,9 @@ exports.handler = async (event, context, callback) => {
     console.log(listStacksData.StackSummaries.length);
     console.log(listStacksData.StackSummaries);
 
-    let stacks = await Promise.all(listStacksData.StackSummaries.map(async function(summary) {
-      //list stack resources
-      console.log('logging id of each stack: ' + summary.StackId);
-      let stackIps = await getStackIps(summary.StackId, summary.StackStatus);
-      console.log("stackIps: ", stackIps);
-      return {
-        stackId: summary.StackId,
-        stackName: summary.StackName,
-        stackCreationTime: summary.CreationTime,
-        stackStatus: summary.StackStatus,
-        stackIps: stackIps
-      };
-    }));
+    let stacks = await Promise.all(
+    	listStacksData.StackSummaries.map(parseStackInfo)
+    );
 
     //define and return HTTP response
     let responseBody = {
@@ -95,6 +85,20 @@ exports.handler = async (event, context, callback) => {
 
     callback(null, response);
 
+}
+
+async function parseStackInfo(summary) {
+	//list stack resources
+	console.log('logging id of each stack: ' + summary.StackId);
+	let stackIps = await getStackIps(summary.StackId, summary.StackStatus);
+	console.log("stackIps: ", stackIps);
+	return {
+		stackId: summary.StackId,
+		stackName: summary.StackName,
+		stackCreationTime: summary.CreationTime,
+		stackStatus: summary.StackStatus,
+		stackIps: stackIps
+	};
 }
 
 //returns array of Strings representing public ipv4 addresses for the stack.
@@ -127,7 +131,8 @@ async function getStackIps(stackId, stackStatus) {
   });
 
   if(spotfleets.length > 1) {
-    console.log("ERROR: stack contains more than one spotfleet resource. Each stack is expected to have a single spotfleet resource.");
+    console.log(
+    	"ERROR: stack contains more than one spotfleet resource. Each stack is expected to have a single spotfleet resource.");
     return;
   }
 
