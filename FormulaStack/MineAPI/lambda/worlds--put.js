@@ -32,7 +32,7 @@ exports.handler = (event, context, callback) => {
 
     //enter world into "worlds" DynamoDB table.
 
-    var params = {
+    let params = {
         TableName:"worlds",
         ReturnConsumedCapacity: "NONE",
         Item:{
@@ -58,7 +58,7 @@ exports.handler = (event, context, callback) => {
 
         //define and return HTTP response
 
-        var response = {
+        let response = {
             isBase64Encoded: true,
             statusCode: 400,
             headers: {},
@@ -72,7 +72,7 @@ exports.handler = (event, context, callback) => {
 
         //define and return HTTP response
 
-        var body = {};
+        let body = {};
 
         body.id = id;
 

@@ -47,7 +47,7 @@ exports.handler = (event, context, callback) => {
 
     //query worlds table for data.
 
-    var params = {
+    let params = {
         TableName:"flavors",
         ProjectionExpression: "flavorID, s3Filepath, minecraftVersion, flavorDescription",
         Limit:event.queryStringParameters.limit
@@ -61,7 +61,7 @@ exports.handler = (event, context, callback) => {
 
         //define and return response
 
-        var response = {
+        let response = {
             isBase64Encoded: true,
             statusCode: 400,
             headers: {
@@ -79,7 +79,7 @@ exports.handler = (event, context, callback) => {
 
         //define and return HTTP response
 
-        var body = {};
+        let body = {};
 
 
         // the following code needs to be finished to implement the next and previous values.

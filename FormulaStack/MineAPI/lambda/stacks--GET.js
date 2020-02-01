@@ -25,13 +25,13 @@ const cfn = new aws.CloudFormation();
 
 exports.handler = async (event, context, callback) => {
 
-    var params = {
+    let params = {
       StackStatusFilter: ['CREATE_COMPLETE', 'CREATE_IN_PROGRESS', 'DELETE_IN_PROGRESS']
     };
 
     console.log('querying current stacks');
 
-    var listStacksData;
+    let listStacksData;
 
     try {
       listStacksData = await cfn.listStacks(params).promise();
@@ -62,7 +62,7 @@ exports.handler = async (event, context, callback) => {
     let stacks = await Promise.all(listStacksData.StackSummaries.map(async function(summary) {
       //list stack resources
       console.log('logging id of each stack: ' + summary.StackId);
-      var stackIps = await getStackIps(summary.StackId, summary.StackStatus);
+      let stackIps = await getStackIps(summary.StackId, summary.StackStatus);
       console.log("stackIps: ", stackIps);
       return {
         stackId: summary.StackId,
@@ -109,7 +109,7 @@ async function getStackIps(stackId, stackStatus) {
     StackName: stackId
   };
 
-  var resourcesData;
+  let resourcesData;
 
   //TODO: error handling
   try {
@@ -139,12 +139,12 @@ async function getStackIps(stackId, stackStatus) {
   let spotfleet = spotfleets[0];
 
   //get the ips of all instances (expected: 1) in the spotfleet
-  var ec2 = new aws.EC2();
+  let ec2 = new aws.EC2();
   let describeSpotFleetInstancesParams = {
     SpotFleetRequestId: spotfleet.PhysicalResourceId
   };
 
-  var describeSpotFleetInstancesData;
+  let describeSpotFleetInstancesData;
 
   try{
     describeSpotFleetInstancesData = await ec2.describeSpotFleetInstances(describeSpotFleetInstancesParams).promise();
@@ -159,11 +159,11 @@ async function getStackIps(stackId, stackStatus) {
     return;
   }
 
-  var describeInstancesparams = {
+  let describeInstancesparams = {
       InstanceIds: [describeSpotFleetInstancesData.ActiveInstances[0].InstanceId]
   };
 
-  var describeInstancesData;
+  let describeInstancesData;
 
   try{
     describeInstancesData = await ec2.describeInstances(describeInstancesparams).promise();
@@ -172,7 +172,7 @@ async function getStackIps(stackId, stackStatus) {
     console.log(err, err.stack);
   }
 
-  var ips = describeInstancesData.Reservations[0].Instances.map(function(instance) {return instance.PublicIpAddress;});
+  let ips = describeInstancesData.Reservations[0].Instances.map(function(instance) {return instance.PublicIpAddress;});
 
   console.log("logging ip");
   console.log("ip:",ips[0]);

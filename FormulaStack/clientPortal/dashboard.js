@@ -411,7 +411,7 @@ function injectStacks() {
   }
 
   //for each flavor object in localStorage array
-  for(var i = 0; i < stacks.length; i++) {
+  for(let i = 0; i < stacks.length; i++) {
 
     let stack = stacks[i];
 

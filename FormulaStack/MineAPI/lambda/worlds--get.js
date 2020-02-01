@@ -47,7 +47,7 @@ exports.handler = (event, context, callback) => {
 
     //query worlds table for data.
 
-    var params = {
+    let params = {
         TableName:"worlds",
         ProjectionExpression: "worldID, flavorID, s3Filepath, worldName",
         Limit:event.queryStringParameters.limit
@@ -61,7 +61,7 @@ exports.handler = (event, context, callback) => {
 
         //define and return response
 
-        var response = {
+        let response = {
             isBase64Encoded: true,
             statusCode: 400,
             headers: {
@@ -79,7 +79,7 @@ exports.handler = (event, context, callback) => {
 
         //define and return HTTP response
 
-        var body = {};
+        let body = {};
 
 
         // the following code needs to be finished to implement the next and previous values.
@@ -99,7 +99,7 @@ exports.handler = (event, context, callback) => {
 
         body.items = data.Items;
 
-        const response = {
+        let response = {
             isBase64Encoded: true,
             statusCode: 200,
             headers: {

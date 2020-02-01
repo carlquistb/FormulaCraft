@@ -22,7 +22,7 @@ exports.handler = (event, context, callback) => {
 
 	const cfn = new aws.CloudFormation();
 
-	var params = {
+	let params = {
 		StackName: event.queryStringParameters.stackName
 		//RetainResources - resource ARNs you want to keep. This is none for our purpose.
 		//RoleARN - ARN of the role cloudformation will assume to delete the resources of the stack. Default = role previously assumed.
@@ -35,7 +35,7 @@ exports.handler = (event, context, callback) => {
 
 			//define and return response
 
-			var response = {
+			let response = {
 					isBase64Encoded: true,
 					statusCode: 400,
 					headers: {
@@ -54,7 +54,7 @@ exports.handler = (event, context, callback) => {
 
 			//define and return HTTP response
 
-			var body = data;
+			let body = data;
 			body.stackName = event.queryStringParameters.stackName;
 
 			const response = {

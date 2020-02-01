@@ -21,7 +21,7 @@ exports.handler = (event, context, callback) => {
 
     const cfn = new aws.CloudFormation();
 
-    var params = {
+    let params = {
       //Capabilities: allows stack to create IAM resources
       Capabilities:['CAPABILITY_NAMED_IAM'],
       StackName:event.queryStringParameters.stackName,
@@ -56,7 +56,7 @@ exports.handler = (event, context, callback) => {
 
         //define and return response
 
-        var response = {
+        let response = {
             isBase64Encoded: true,
             statusCode: 400,
             headers: {},
@@ -71,7 +71,7 @@ exports.handler = (event, context, callback) => {
 
         //define and return HTTP response
 
-        var body = data;
+        let body = data;
         body.stackName = event.queryStringParameters.stackName;
 
         const response = {
