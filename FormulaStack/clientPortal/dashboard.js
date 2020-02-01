@@ -73,8 +73,8 @@ function deleteStack(stackName) {
   .then(checkRequestStatus)
   .then(JSON.parse)
   .then(function(data) {
-    //store data or update display?
-    alert(JSON.stringify(data));
+    alert("posted delete request.");
+    refreshStacks();
   })
   .catch(alert);
 }
@@ -97,12 +97,7 @@ function createStackWithWorld(stackName, worldS3Filepath, flavorS3Filepath, inst
     }
   )
   .then(checkRequestStatus)
-  .then(JSON.parse)
-  .then(function(data){
-    //store data or update display?
-    alert(JSON.stringify(data))
-  })
-  .catch(alert);
+  .then(JSON.parse);
 }
 
 //obtain new stacks data.
@@ -260,18 +255,17 @@ function injectWorlds() {
         cardFooterLinkSmall.setAttribute("data-flavorS3Filepath", flavor.s3Filepath);
         cardFooterLinkSmall.setAttribute("data-instanceType", "m5.large");
         cardFooterLinkSmall.onclick = function() {
-          alert(
-            this.getAttribute("data-worldName"),
-            this.getAttribute("data-worldS3Filepath"),
-            this.getAttribute("data-flavorS3Filepath"),
-            this.getAttribute("data-instanceType")
-          );
           createStackWithWorld(
             this.getAttribute("data-worldName") + "-" + Date.now(),  //stackName
             this.getAttribute("data-worldS3Filepath"),
             this.getAttribute("data-flavorS3Filepath"),
             this.getAttribute("data-instanceType")
-          ).then(alert("done!"));
+          )
+          .then(function(data){
+            alert("posted stack request.");
+            refreshStacks();
+          })
+          .catch(alert);
         };
         cardFooterLinkSmall.appendChild(document.createTextNode(
           "small "
@@ -285,18 +279,17 @@ function injectWorlds() {
         cardFooterLinkMedium.setAttribute("data-flavorS3Filepath", flavor.s3Filepath);
         cardFooterLinkMedium.setAttribute("data-instanceType", "r5.large");
         cardFooterLinkMedium.onclick = function() {
-          alert(
-            this.getAttribute("data-worldName"),
-            this.getAttribute("data-worldS3Filepath"),
-            this.getAttribute("data-flavorS3Filepath"),
-            this.getAttribute("data-instanceType")
-          );
           createStackWithWorld(
             this.getAttribute("data-worldName") + "-" + Date.now(),  //stackName
             this.getAttribute("data-worldS3Filepath"),
             this.getAttribute("data-flavorS3Filepath"),
             this.getAttribute("data-instanceType")
-          ).then(alert("done!"));
+          )
+          .then(function(data){
+            alert("posted stack request.");
+            refreshStacks();
+          })
+          .catch(alert);
         };
         cardFooterLinkMedium.appendChild(document.createTextNode(
           "medium "
@@ -310,18 +303,17 @@ function injectWorlds() {
         cardFooterLinklarge.setAttribute("data-flavorS3Filepath", flavor.s3Filepath);
         cardFooterLinklarge.setAttribute("data-instanceType", "m5.xlarge");
         cardFooterLinklarge.onclick = function() {
-          alert(
-            this.getAttribute("data-worldName"),
-            this.getAttribute("data-worldS3Filepath"),
-            this.getAttribute("data-flavorS3Filepath"),
-            this.getAttribute("data-instanceType")
-          );
           createStackWithWorld(
             this.getAttribute("data-worldName") + "-" + Date.now(),  //stackName
             this.getAttribute("data-worldS3Filepath"),
             this.getAttribute("data-flavorS3Filepath"),
             this.getAttribute("data-instanceType")
-          ).then(alert("done!"));
+          )
+          .then(function(data){
+            alert("posted stack request.");
+            refreshStacks();
+          })
+          .catch(alert);
         };
         cardFooterLinklarge.appendChild(document.createTextNode(
           "large "
