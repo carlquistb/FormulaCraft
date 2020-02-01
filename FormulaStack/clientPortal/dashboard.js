@@ -3,14 +3,14 @@
 const API_URL = "https://lt175p2wc6.execute-api.us-west-2.amazonaws.com/v0-1";
 
 //set onclick functions.
-$("#refresh-worlds").click(refreshWorlds);
 $("#refresh-flavors").click(refreshFlavors);
+$("#refresh-worlds").click(refreshWorlds);
 $("#refresh-stacks").click(refreshStacks);
 
 //set onload function.
 $(document).ready(function() {
-  injectWorlds();
   injectFlavors();
+  injectWorlds();
   injectStacks();
 });
 
@@ -19,7 +19,7 @@ $(document).ready(function() {
 //injects objects for worlds not currently displayed.
 function refreshWorlds() {
   iconClickLoading(this, function(){
-    return fetchWorlds().then(fetchWorlds).then(injectWorlds);
+    return fetchWorlds().then(injectWorlds);
   });
 }
 
