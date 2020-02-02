@@ -1,50 +1,46 @@
 # FormulaCraft
-A SMS-based service for running Minecraft server on AWS.
+A Proof of Concept project for running Minecraft servers on AWS.
 
-![the project.](media/FormulaStack.png)
+![the project.](media/FormulaCraftdetailV2.png)
 
-# ThePlan
+## Project Summary
 
-**NOTE** that this repo is currently under construction. This is a learning process in which I will dig deeper into a few technologies, and I don't expect it to be complete for a few months.
+The public cloud affords on demand compute power. This can be utilized by hosting providers to offer more granular payment options, as you **pay by the hour or by the second**.
 
-This implementation will have two high level components. First, a AWS Cloudformation script that implements the SMS-based API for querying the status of servers being run. Second, a Cloudformation script that implements the stack for each server requested. We will work from the bottom up, hoping to develop the stack,  fully automated, first. Before the creation of this repo, significant work was done creating a working stack allowing for MCServer to run.
+This will serve an **under-represented community of casual gamer groups**, who will operate servers for low and sporadic time intervals. Current hosting providers typically offer a monthly subscription, with limited provisions for raising or lowering your capacity; but no hourly or even daily subscription options. This leads to idle servers and wasted resources.
 
-# Resources
 
-## .gitignore
-- .pem, .ppk are both keys used for accessing ec2 instances through SSH on Windows.
-- .txt are almost always my own simple note files. Not necessary for understanding this repo.
+# Built With
+- [node.js](https://nodejs.org/en/) - The server backend framework.
+- [child_process](https://nodejs.org/api/child_process.html) - The MC Server monitoring used.
+- [AWS CloudFormation](https://aws.amazon.com/cloudformation/) - For programmatic resource partitioning.
+- [AWS S3 web hosting](https://docs.aws.amazon.com/AmazonS3/latest/dev/WebsiteHosting.html) - Hosting the Client Portal.
+- [Creative Tim](https://www.creative-tim.com/product/material-dashboard-pro-react) - The front-end style framework.
+- [AWS Lambda & API Gateway](https://aws.amazon.com/api-gateway/) - The interaction layer API.
+- [Cloudcraft](https://cloudcraft.co/) - Visual AWS representations.
 
-## FormulaStack
-- This Cloudformation stack will generate the resources needed to run the API that will give and answer calls for Minecraft Servers. This stack should be left up for the duration of the project's use.
+# Versioning
+
+- (complete January, 2020) Version 1 is a proof of concept. Minimal client-side functionality or optimizations.
+- (March, 2020) Version 2 is a tuning update. Focus will be as follows:
+  - Stack partitioning. More efficient resource partitioning.
+  - Client Portal redesign. A more intuitive approach allowing for more features in future updates.
+  - CI/CD definitions.
+- (May, 2020) Version 3 is a features update. Focus will be as follows:
+  - User quality of life changes.
+  - Mod compatability and availability.
+  - distributable software.
+- (July, 2020) Version 4 is a marketing update. At this point, the project will likely be sold or monetized.
+
+# Authors
+
+- Brendan Carlquist
+- Nathan Lipiarski
+- (past contributor) Austin Quach
+- (onboarding) Oliver Kou
 
 ## AutoStack
 - This Cloudformation script will create a proprietary stack for each Minecraft Server requested through the API. These stacks will be brought up and down by the API, and will not be generated manually at all, unless for debugging purposes.
 - set up cronjob to automatically upload world over time.
 - run mineShell.
 - clean up save and close down stack...? (TODO: close down stack automation.)
-
-# dependencies
-
-## S3 bucket structure
-- Your S3 bucket is required to have a certain degree of organization. subfolders to include:
-- **server** - this will contain several versions of the server.jar and dependencies. You can include other mod packs, other data packs and textures, etc.
-- **world** - this will contain world folders (and possibly player folders?? we'll come back to that. Perhaps rename this to **level**)
-- **dependencies** - this is where the cronjob, mineShell, and other code will reside.
-
-# the Stack
-
-- AWS Cloudformation
-- EC2 userdata for run on startup services
-- Node.js for MCServer wrapper.
-- AWS services including EC2, Lambda, SMS/SQS, etc in API implementation.
-
-# notes
-
-below this section, all of this is just notes for myself.
-
-## resources
-- [Tool for building AWS visual structure diagrams!](https://cloudcraft.co/)
-- https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-up-node-on-ec2-instance.html
-- similar project from Positron: https://github.com/positron/aws-minecraft
-- https://www.twilio.com/blog/2014/11/child-processes-streams-minecraft-multiplayer-server-nodejs.html
