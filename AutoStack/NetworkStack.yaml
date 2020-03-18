@@ -1,0 +1,134 @@
+Resources:
+  MyFleetRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Action:
+          - sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service:
+            - spotfleet.amazonaws.com
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AmazonEC2SpotFleetTaggingRole
+  IAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - "ec2.amazonaws.com"
+            Action:
+              - "sts:AssumeRole"
+      Path: "/"
+  RolePolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: "mc-ec2-s3-accessPolicy"
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: "Allow"
+            Action:
+              - "s3:PutAccountPublicAccessBlock"
+              - "s3:GetAccountPublicAccessBlock"
+              - "s3:ListAllMyBuckets"
+              - "s3:HeadBucket"
+            Resource: "*"
+          -
+            Effect: "Allow"
+            Action:
+              - "s3:*"
+            Resource:
+              - "arn:aws:s3:::bc-minecraft-repo"
+              - "arn:aws:s3:::*/*"
+      Roles:
+        -
+          !Ref IAMRole
+  MyInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: "/"
+      Roles:
+        - !Ref IAMRole
+  MyVPC:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      CidrBlock: 172.32.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+  MyInternetGateway:
+    Type: 'AWS::EC2::InternetGateway'
+  MyGatewayAttachment:
+    Type: 'AWS::EC2::VPCGatewayAttachment'
+    Properties:
+      InternetGatewayId: !Ref MyInternetGateway
+      VpcId: !Ref MyVPC
+  MyRouteTable:
+    Type: 'AWS::EC2::RouteTable'
+    Properties:
+      VpcId: !Ref MyVPC
+  MyRoute:
+    Type: 'AWS::EC2::Route'
+    Properties:
+      RouteTableId: !Ref MyRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref MyInternetGateway
+  MySubnetA:
+    Type: 'AWS::EC2::Subnet'
+    Properties:
+      VpcId: !Ref MyVPC
+      CidrBlock: 172.32.0.0/20
+      MapPublicIpOnLaunch: true
+  MySubnetRouteTableAssociation:
+    Type: 'AWS::EC2::SubnetRouteTableAssociation'
+    Properties:
+      SubnetId: !Ref MySubnetA
+      RouteTableId: !Ref MyRouteTable
+  MyEC2SecGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      VpcId: !Ref MyVPC
+      GroupName: MineCraftEC2SecGroup
+      GroupDescription: Minecraft EC2 Sec Group
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 25565
+          ToPort: 25565
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+Outputs:
+  MyFleetRoleArn:
+    Description: ARN of fleet role with EC2 access.
+    Value: !GetAtt MyFleetRole.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-MyFleetRoleArn"
+  MyInstanceProfileArn:
+    Description: ARN of instance profile.
+    Value: !GetAtt MyInstanceProfile.Arn
+    Export:
+      Name: !Sub "${AWS::StackName}-MyInstanceProfileArn"
+  MyEC2SecGroupGroupId:
+    Description: ARN of Security Group for EC2 instance.
+    Value: !GetAtt MyEC2SecGroup.GroupId
+    Export:
+      Name: !Sub "${AWS::StackName}-MyEC2SecGroupGroupId"
+  MySubnetAId:
+    Description: ARN of Subnet A.
+    Value: !Ref MySubnetA
+    Export:
+      Name: !Sub "${AWS::StackName}-MySubnetAId"
+  MyIamRoleName:
+    Description: Name of role used in Instance Profile.
+    Value: !Ref IAMRole
+    Export:
+      Name: !Sub "${AWS::StackName}-myIamRoleArn"
