@@ -103,7 +103,7 @@ function createStackWithWorld(stackName, worldS3Filepath, flavorS3Filepath, inst
 //obtain new stacks data.
 function fetchStacks() {
   let url = API_URL + "/stacks";
-  let urlParams = "limit=5";
+  let urlParams = "limit=10";
   return fetch(
     url+"?"+urlParams,
     {
@@ -125,7 +125,7 @@ function fetchStacks() {
 //obtain new flavors data.
 function fetchFlavors() {
   let url = API_URL + "/flavors";
-  let urlParams = "limit=5";
+  let urlParams = "limit=10";
   return fetch(
     url+"?"+urlParams,
     {
@@ -148,7 +148,7 @@ function fetchFlavors() {
 function fetchWorlds() {
 
   let url = API_URL + "/worlds";
-  let urlParams = "limit=5";
+  let urlParams = "limit=10";
   return fetch(
     url+"?"+urlParams,
     {
