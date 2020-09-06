@@ -8,7 +8,7 @@ WORLD_URL=$1
 FLAVOR_URL=$2
 STACK_NAME=$3
 
-sudo yum install -y java python3 gcc-c++
+sudo yum install -y java-1.8.0 python3 gcc-c++
 # This script adds the nodejs repository to yum
 curl -sL https://rpm.nodesource.com/setup_10.x | sudo -E bash -
 sudo yum install -y nodejs
@@ -41,7 +41,7 @@ fi
 
 echo "{" > scripts/instance_data.json
 echo "\"available_ram\":\"$AVAILABLE_RAM\"," >> scripts/instance_data.json
-echo "\"world_url\":\"$WORLD_URL\"" >> scripts/instance_data.json
+echo "\"world_url\":\"$WORLD_URL\"," >> scripts/instance_data.json
 echo "\"stack_name\":\"$STACK_NAME\"" >> scripts/instance_data.json
 echo "}" >> scripts/instance_data.json
 
