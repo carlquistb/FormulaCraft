@@ -1,0 +1,14 @@
+#!/bin/bash
+if [[ $# -eq 1 ]]
+then
+	for FOLDER_NAME in "world" "config" "local" "structurize" "structures" "TombManyGraves" "astralsorcery" "patchouli_books" "journeymap"
+	do
+			aws s3 sync "/home/ec2-user/mc/$FOLDER_NAME" "$1/$FOLDER_NAME"
+	done
+	for FILE_NAME in "options.txt" "banned-ips.json" "banned-players.json" "ops.json" "server.properties" "whitelist.json"
+	do
+		aws s3 cp "/home/ec2-user/mc/$FILE_NAME" "$1/$FILE_NAME"
+	done
+else
+	echo "Usage $0 <aws world folder url>"
+fi
