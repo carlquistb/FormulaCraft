@@ -5,5 +5,5 @@ After=network.target
 [Service]
 RestartSec=1
 User=root
-ExecStart=/bin/node /home/ec2-user/scripts/mineShell.js
+ExecStart=/bin/node /home/ec2-user/autostack-scripts/mineShell.js
 KillMode=process

@@ -15,8 +15,8 @@ sudo yum install -y nodejs
 
 cd /home/ec2-user
 #download the default scripts and service.
-aws s3 sync s3://bc-minecraft-repo/scripts scripts
-aws s3 sync s3://bc-minecraft-repo/service service
+aws s3 sync s3://bc-minecraft-repo/scripts autostack-scripts
+aws s3 sync s3://bc-minecraft-repo/service autostack-service
 
 #download the flavor and world files.
 #These may contain overwriting script files such as a unique uploadworld script.
@@ -42,14 +42,14 @@ if [[ -z "$AVAILABLE_RAM" ]]; then
 	exit
 fi
 
-echo "{" > scripts/instance_data.json
-echo "\"available_ram\":\"$AVAILABLE_RAM\"," >> scripts/instance_data.json
-echo "\"world_url\":\"$WORLD_URL\"," >> scripts/instance_data.json
-echo "\"stack_name\":\"$STACK_NAME\"" >> scripts/instance_data.json
-echo "}" >> scripts/instance_data.json
+echo "{" > autostack-scripts/instance_data.json
+echo "\"available_ram\":\"$AVAILABLE_RAM\"," >> autostack-scripts/instance_data.json
+echo "\"world_url\":\"$WORLD_URL\"," >> autostack-scripts/instance_data.json
+echo "\"stack_name\":\"$STACK_NAME\"" >> autostack-scripts/instance_data.json
+echo "}" >> autostack-scripts/instance_data.json
 
-chmod +x /home/ec2-user/scripts/uploadworld
-chmod +x /home/ec2-user/scripts/closestack
+chmod +x /home/ec2-user/autostack-scripts/uploadworld
+chmod +x /home/ec2-user/autostack-scripts/closestack
 
-cp service/mineService.service /etc/systemd/system/mineService.service
+cp autostack-service/mineService.service /etc/systemd/system/mineService.service
 systemctl start mineService

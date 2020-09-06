@@ -17,7 +17,7 @@ const fs = require('fs'); //fileserver library
 const spawn = require('child_process').spawn; //this function creates a child process (basically another shell for Minecraft to run in)
 const execFile = require('child_process').execFile;
 
-let instance_data = JSON.parse(fs.readFileSync("/home/ec2-user/scripts/instance_data.json"));
+let instance_data = JSON.parse(fs.readFileSync("/home/ec2-user/autostack-scripts/instance_data.json"));
 let ram = instance_data["available_ram"];
 
 //spawn a child_process to run java. reference: child_process.spawn(command[, args][, options])
@@ -27,7 +27,7 @@ const child = spawn('java', commandLineOpts, spawnOpts);
 
 function uploadWorld() {
 	log("Uploading world...");
-	execFile("/home/ec2-user/scripts/uploadworld",
+	execFile("/home/ec2-user/autostack-scripts/uploadworld",
 	         [instance_data["world_url"]],
 	         function (error, stdout, stderr) {
 		if (error) {
@@ -40,7 +40,7 @@ function uploadWorld() {
 
 function closeStack() {
 	log("closing stack...");
-	execFile("/home/ec2-user/scripts/closestack",
+	execFile("/home/ec2-user/autostack-scripts/closestack",
 					[instance_data["stack_name"]],
 					function (error, stdout, stderr) {
 		if(error) {
