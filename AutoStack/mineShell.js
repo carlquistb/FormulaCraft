@@ -9,8 +9,9 @@
 
 */
 const StreamWatcher = require('./StreamWatcher.js');
-const fs = require('fs');
-const spawn = require('child_process').spawn;
+const PlayerWatcher = require('./PlayerWatcher.js');
+const fs = require('fs'); //fileserver library
+const spawn = require('child_process').spawn; //this function creates a child process (basically another shell for Minecraft to run in)
 const execFile = require('child_process').execFile;
 
 //read in available RAM
@@ -54,6 +55,10 @@ function closeStack() {
 		});
 }
 
+function shutdown() {
+	child.stdin.write("stop\n");
+}
+
 function log(str) {
 	console.log("[mineShell] " + str);
 }
@@ -61,12 +66,13 @@ function log(str) {
 let streamWatcher = new StreamWatcher(child);
 streamWatcher.addOnExit(function () {
 	uploadWorld();
+	closeStack();
 	mclogWriteStream.end();
 	process.exit(0);
 });
 
 streamWatcher.addWatcher(/the answer is 42/, function (stdin, regexData) {
-	stdin.write("stop\n");
+	shutdown();
 });
 
 streamWatcher.addWatcher(/I need help/, function (stdin, regexData) {
@@ -99,14 +105,18 @@ streamWatcher.addWatcher(/supersave/, function (stdin, regexData) {
 
 streamWatcher.addWatcher(/shut it down!!!/, function (stdin, regexData) {
 	stdin.write("say This server is shutting down! Evacuate! Burn the diamonds!\n");
-	closeStack();
+	shutdown();
 });
+
+
+let playerWatcher = new PlayerWatcher(shutdown);
+playerWatcher.registerWithStreamWatcher(streamWatcher);
 
 // The SIGTERM event will be sent by systemctl when the service is stopped
 process.on("SIGTERM", function () {
 	log("[mineShell] Shutting down server...");
 	child.stdin.write("say Server shutting down\n");
-	child.stdin.write("stop\n");
+	shutdown();
 });
 
 setInterval(uploadWorld, 1000 * 60 * 15); //run the uploadWorld method every 15 minutes.
