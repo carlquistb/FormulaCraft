@@ -7,7 +7,6 @@ function PlayerWatcher(shutdownFunc) {
 }
 
 PlayerWatcher.prototype.registerWithStreamWatcher = function(streamWatcher) {
-	//[15:53:15] [Server thread/INFO]: NateThePlate left the game
     streamWatcher.addWatcher(
     	/^\[\d\d:\d\d:\d\d\] \[Server thread\/INFO\]: ([\S]+) joined the game/, 
     	(stdin, regexData) => this._addPlayer(stdin, regexData)
@@ -45,5 +44,5 @@ PlayerWatcher.prototype._updateInterval = function() {
     if (this._shutdownInterval) {
         clearInterval(this._shutdownInterval);
     }
-    this._shutdownInterval = setInterval(() => this._attemptShutdown(), 1000 * 60 * 2);
+    this._shutdownInterval = setInterval(() => this._attemptShutdown(), 1000 * 60 * 15);
 }
