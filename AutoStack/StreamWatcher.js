@@ -11,15 +11,14 @@ module.exports = StreamWatcher;
  * @param child_process the result of a call to child_process.spawn
  */
 function StreamWatcher(child_process) {
-	if (child_process == null || child_process == undefined || child_process == '')
-		throw new Error("Invalid child process");
+    if (child_process == null || child_process == undefined || child_process == '')
+        throw new Error("Invalid child process");
 
-	this._process = child_process;
-	this._patterns = [];
-	this._callbacks = [];
-	this._process.stdout.on('data', onData.bind(this));
-	this._process.stderr.on('data', onData.bind(this));
-	this._checkRep();
+    this._process = child_process;
+    this._patterns = [];
+    this._callbacks = [];
+    this._process.stdout.on('data', (data) => this._onData(data));
+    this._process.stderr.on('data', (data) => this._onData(data));
 }
 
 /**
@@ -32,15 +31,14 @@ function StreamWatcher(child_process) {
  *                  and the results of executing the pattern on the string when
  *                  the pattern matches.
  */
-StreamWatcher.prototype.addWatcher = function (pattern, callback) {
-	if (pattern == null || pattern == undefined || pattern == '')
-    		throw new Error("Invalid pattern");
-  	if (callback == null || callback == undefined || callback == '')
-  		throw new Error("Invalid callback");
+StreamWatcher.prototype.addWatcher = function(pattern, callback) {
+    if (pattern == null || pattern == undefined || pattern == '')
+        throw new Error("Invalid pattern");
+    if (callback == null || callback == undefined || callback == '')
+        throw new Error("Invalid callback");
 
-	this._patterns.push(pattern);
-	this._callbacks.push(callback);
-	this._checkRep();
+    this._patterns.push(pattern);
+    this._callbacks.push(callback);
 }
 
 /**
@@ -49,24 +47,18 @@ StreamWatcher.prototype.addWatcher = function (pattern, callback) {
  *
  * @param callback The function to call on the child process's exit.
  */
-StreamWatcher.prototype.addOnExit = function (callback) {
-	this._process.on("exit", callback);
+StreamWatcher.prototype.addOnExit = function(callback) {
+    this._process.on("exit", callback);
 }
 
-function onData(data) {
-	this._checkRep();
-	let strData = String(data);
-	for (let i = 0; i < this._patterns.length; i++) {
-		let pattern = this._patterns[i];
-		let result = pattern.exec(strData);
-		if (result != null) {
-			let func = this._callbacks[i];
-			func(this._process.stdin, result);
-		}
-	}
-}
-
-StreamWatcher.prototype._checkRep = function () {
-	if (this._patterns.length != this._callbacks.length)
-		throw new Error("Check rep failed");
+StreamWatcher.prototype._onData = function(data) {
+    let strData = String(data);
+    for (let i = 0; i < this._patterns.length; i++) {
+        let pattern = this._patterns[i];
+        let result = pattern.exec(strData);
+        if (result != null) {
+            let func = this._callbacks[i];
+            func(this._process.stdin, result);
+        }
+    }
 }
