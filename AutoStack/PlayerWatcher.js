@@ -8,11 +8,11 @@ function PlayerWatcher(shutdownFunc) {
 
 PlayerWatcher.prototype.registerWithStreamWatcher = function (streamWatcher) {
     streamWatcher.addWatcher(
-        /^\[\d\d:\d\d:\d\d\] \[Server thread\/INFO\]: ([\S]+) joined the game/,
+        /^\[\d\d:\d\d:\d\d\][\w\[\]\/ ]*?: (\S+) joined the game/,
         (stdin, regexData) => this._addPlayer(stdin, regexData)
     );
     streamWatcher.addWatcher(
-        /^\[\d\d:\d\d:\d\d\] \[Server thread\/INFO\]: ([\S]+) left the game/,
+        /^\[\d\d:\d\d:\d\d\][\w\[\]\/ ]*?: (\S+) left the game/,
         (stdin, regexData) => this._removePlayer(stdin, regexData)
     );
 }
