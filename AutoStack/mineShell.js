@@ -1,8 +1,8 @@
 /*
 	Project: FormulaCraft
 
-	mineShell is a Node script that will be executed by the userdata of ec2 instances brought online 
-	by the AutoStack Cloudformation stack.  This utilizes a child process to run Minecraft Server 
+	mineShell is a Node script that will be executed by the userdata of ec2 instances brought online
+	by the AutoStack Cloudformation stack.  This utilizes a child process to run Minecraft Server
 	inside this script.
 
 	This script will handle boot up and boot down of the .jar file.
@@ -13,12 +13,16 @@ const fs = require('fs');
 const spawn = require('child_process').spawn;
 const execFile = require('child_process').execFile;
 
+//read in available RAM
 let instance_data = JSON.parse(fs.readFileSync("/home/ec2-user/autostack-scripts/instance_data.json"));
 let ram = instance_data["available_ram"];
 
+//create writeable stream for the childprocess stdio.
+let mclogWriteStream = fs.createWriteStream('mclog.txt');
+
 //spawn a child_process to run java. reference: child_process.spawn(command[, args][, options])
 let commandLineOpts = ["-Xmx" + ram, "-Xms" + ram, "-jar", "server.jar", "nogui"];
-let spawnOpts = { "cwd": "/home/ec2-user/mc", "stdio": ["pipe", "pipe", "pipe"] };
+let spawnOpts = { "cwd": "/home/ec2-user/mc", "stdio": ["pipe", mclogWriteStream, mclogWriteStream] };
 const child = spawn('java', commandLineOpts, spawnOpts);
 
 function uploadWorld() {
@@ -51,10 +55,6 @@ function log(str) {
 	console.log("[mineShell] " + str);
 }
 
-//pipe data received from the shell into the subprocess, and from the subprocess through to the shell.
-child.stdout.pipe(process.stdout);
-child.stderr.pipe(process.stderr);
-
 let streamWatcher = new StreamWatcher(child);
 streamWatcher.addOnExit(function () {
 	uploadWorld();
@@ -85,7 +85,7 @@ streamWatcher.addWatcher(/supersave/, function (stdin, regexData) {
 	log("player initiated save");
 	stdin.write("say local save initiated\n");
 	stdin.write("save-all\n");
-	// I am using a 5 second timeout for right now, but I think we can implement this with a second 
+	// I am using a 5 second timeout for right now, but I think we can implement this with a second
 	// watcher that waits for the save to be completed.
 	setTimeout(function () {
 		uploadWorld();
