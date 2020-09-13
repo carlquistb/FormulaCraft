@@ -58,6 +58,7 @@ function log(str) {
 let streamWatcher = new StreamWatcher(child);
 streamWatcher.addOnExit(function () {
 	uploadWorld();
+	mclogWriteStream.end();
 	process.exit(0);
 });
 
