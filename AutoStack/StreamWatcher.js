@@ -11,7 +11,7 @@ module.exports = StreamWatcher;
  * @param child_process the result of a call to child_process.spawn
  */
 function StreamWatcher(childProcess) {
-	if (!childeProcess)
+	if (!childProcess)
 		throw new Error("Invalid child process");
 
 	this._process = childProcess;
