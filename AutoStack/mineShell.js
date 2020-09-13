@@ -18,12 +18,15 @@ let instance_data = JSON.parse(fs.readFileSync("/home/ec2-user/autostack-scripts
 let ram = instance_data["available_ram"];
 
 //create writeable stream for the childprocess stdio.
-let mclogWriteStream = fs.createWriteStream('mclog.txt');
+let mclogWriteStream = fs.createWriteStream('/var/log/mclog.txt');
 
 //spawn a child_process to run java. reference: child_process.spawn(command[, args][, options])
 let commandLineOpts = ["-Xmx" + ram, "-Xms" + ram, "-jar", "server.jar", "nogui"];
-let spawnOpts = { "cwd": "/home/ec2-user/mc", "stdio": ["pipe", mclogWriteStream, mclogWriteStream] };
+let spawnOpts = { "cwd": "/home/ec2-user/mc", "stdio": ["pipe", "pipe", "pipe"] };
 const child = spawn('java', commandLineOpts, spawnOpts);
+
+child.stdout.pipe(mclogWriteStream);
+child.stderr.pipe(mclogWriteStream);
 
 function uploadWorld() {
 	log("Uploading world...");
