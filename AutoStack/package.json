@@ -1,0 +1,17 @@
+{
+  "name": "autostack",
+  "description": "Runs a Minecraft server with additional AWS interfacing",
+  "license": "MIT",
+  "repository": "https://github.com/carlquistb/FormulaCraf/",
+  "devDependencies": {
+    "eslint": "^7.9.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "prettier": "^2.1.1"
+  },
+  "dependencies": {},
+  "scripts": {
+    "lint": "npx eslint --fix . --ext .js"
+  }
+}

@@ -8,30 +8,39 @@
 	This script will handle boot up and boot down of the .jar file.
 
 */
-const StreamWatcher = require('./StreamWatcher.js');
-const PlayerWatcher = require('./PlayerWatcher.js');
-const fs = require('fs'); //fileserver library
-const spawn = require('child_process').spawn; //this function creates a child process (basically another shell for Minecraft to run in)
-const execFile = require('child_process').execFile;
+const StreamWatcher = require("./StreamWatcher.js");
+const PlayerWatcher = require("./PlayerWatcher.js");
+const fs = require("fs"); //fileserver library
+const spawn = require("child_process").spawn; //this function creates a child process (basically another shell for Minecraft to run in)
+const execFile = require("child_process").execFile;
 
 //read in available RAM
-let instance_data = JSON.parse(fs.readFileSync("/home/ec2-user/autostack-scripts/instance_data.json"));
+let instance_data = JSON.parse(
+	fs.readFileSync("/home/ec2-user/autostack-scripts/instance_data.json")
+);
 let ram = instance_data["available_ram"];
 
 //create writeable stream for the childprocess stdio.
-let mclogWriteStream = fs.createWriteStream('/var/log/mclog.txt');
+let mclogWriteStream = fs.createWriteStream("/var/log/mclog.txt");
 
 //spawn a child_process to run java. reference: child_process.spawn(command[, args][, options])
-let commandLineOpts = ["-Xmx" + ram, "-Xms" + ram, "-jar", "server.jar", "nogui"];
-let spawnOpts = { "cwd": "/home/ec2-user/mc", "stdio": ["pipe", "pipe", "pipe"] };
-const child = spawn('java', commandLineOpts, spawnOpts);
+let commandLineOpts = [
+	"-Xmx" + ram,
+	"-Xms" + ram,
+	"-jar",
+	"server.jar",
+	"nogui",
+];
+let spawnOpts = { cwd: "/home/ec2-user/mc", stdio: ["pipe", "pipe", "pipe"] };
+const child = spawn("java", commandLineOpts, spawnOpts);
 
 child.stdout.pipe(mclogWriteStream);
 child.stderr.pipe(mclogWriteStream);
 
 function uploadWorld() {
 	log("Uploading world...");
-	execFile("/home/ec2-user/autostack-scripts/uploadworld",
+	execFile(
+		"/home/ec2-user/autostack-scripts/uploadworld",
 		[instance_data["world_url"]],
 		function (error, stdout, stderr) {
 			if (error) {
@@ -39,12 +48,14 @@ function uploadWorld() {
 			} else if (stderr.length != 0) {
 				log("Error while uploading world: " + stderr);
 			}
-		});
+		}
+	);
 }
 
 function closeStack() {
 	log("closing stack...");
-	execFile("/home/ec2-user/autostack-scripts/closestack",
+	execFile(
+		"/home/ec2-user/autostack-scripts/closestack",
 		[instance_data["stack_name"]],
 		function (error, stdout, stderr) {
 			if (error) {
@@ -52,7 +63,8 @@ function closeStack() {
 			} else if (stderr.length != 0) {
 				log("Error while closing stack: " + stderr);
 			}
-		});
+		}
+	);
 }
 
 function shutdown() {
@@ -71,11 +83,11 @@ streamWatcher.addOnExit(function () {
 	process.exit(0);
 });
 
-streamWatcher.addWatcher(/the answer is 42/, function (stdin, regexData) {
+streamWatcher.addWatcher(/the answer is 42/, function () {
 	shutdown();
 });
 
-streamWatcher.addWatcher(/I need help/, function (stdin, regexData) {
+streamWatcher.addWatcher(/I need help/, function (stdin) {
 	stdin.write("say your wish is my command\n");
 });
 
@@ -85,13 +97,16 @@ streamWatcher.addWatcher(/give ([\S]+) the power/, function (stdin, regexData) {
 	stdin.write(`tell ${regexData[1]} you have the power\n`);
 });
 
-streamWatcher.addWatcher(/take the power from ([\S]+)/, function (stdin, regexData) {
+streamWatcher.addWatcher(/take the power from ([\S]+)/, function (
+	stdin,
+	regexData
+) {
 	log("player name: " + regexData[1]);
 	stdin.write(`deop ${regexData[1]}\n`);
 	stdin.write(`tell ${regexData[1]} you have lost the power\n`);
 });
 
-streamWatcher.addWatcher(/supersave/, function (stdin, regexData) {
+streamWatcher.addWatcher(/supersave/, function (stdin) {
 	log("player initiated save");
 	stdin.write("say local save initiated\n");
 	stdin.write("save-all\n");
@@ -103,11 +118,12 @@ streamWatcher.addWatcher(/supersave/, function (stdin, regexData) {
 	}, 5000);
 });
 
-streamWatcher.addWatcher(/shut it down!!!/, function (stdin, regexData) {
-	stdin.write("say This server is shutting down! Evacuate! Burn the diamonds!\n");
+streamWatcher.addWatcher(/shut it down!!!/, function (stdin) {
+	stdin.write(
+		"say This server is shutting down! Evacuate! Burn the diamonds!\n"
+	);
 	shutdown();
 });
-
 
 let playerWatcher = new PlayerWatcher(shutdown);
 playerWatcher.registerWithStreamWatcher(streamWatcher);
