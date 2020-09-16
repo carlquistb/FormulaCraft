@@ -30,6 +30,11 @@
         "semi": [
             "error",
             "always"
-        ]
+        ],
+        "prefer-const": "error",
+        "curly": "error",
+        "no-invalid-this": "error",
+        "no-useless-call": "error",
+        "no-useless-return": "error"
     }
 }

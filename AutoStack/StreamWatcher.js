@@ -11,7 +11,9 @@ module.exports = StreamWatcher;
  * @param child_process the result of a call to child_process.spawn
  */
 function StreamWatcher(childProcess) {
-	if (!childProcess) throw new Error("Invalid child process");
+	if (!childProcess) {
+		throw new Error("Invalid child process");
+	}
 
 	this._process = childProcess;
 	this._patterns = [];
@@ -31,8 +33,12 @@ function StreamWatcher(childProcess) {
  *                  the pattern matches.
  */
 StreamWatcher.prototype.addWatcher = function (pattern, callback) {
-	if (!pattern) throw new Error("Invalid pattern");
-	if (!callback) throw new Error("Invalid callback");
+	if (!pattern) {
+		throw new Error("Invalid pattern");
+	}
+	if (!callback) {
+		throw new Error("Invalid callback");
+	}
 
 	this._patterns.push(pattern);
 	this._callbacks.push(callback);
@@ -49,12 +55,12 @@ StreamWatcher.prototype.addOnExit = function (callback) {
 };
 
 StreamWatcher.prototype._onData = function (data) {
-	let strData = String(data);
+	const strData = String(data);
 	for (let i = 0; i < this._patterns.length; i++) {
-		let pattern = this._patterns[i];
-		let result = pattern.exec(strData);
+		const pattern = this._patterns[i];
+		const result = pattern.exec(strData);
 		if (result != null) {
-			let func = this._callbacks[i];
+			const func = this._callbacks[i];
 			func(this._process.stdin, result);
 		}
 	}

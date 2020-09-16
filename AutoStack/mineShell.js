@@ -15,23 +15,23 @@ const spawn = require("child_process").spawn; //this function creates a child pr
 const execFile = require("child_process").execFile;
 
 //read in available RAM
-let instance_data = JSON.parse(
+const instance_data = JSON.parse(
 	fs.readFileSync("/home/ec2-user/autostack-scripts/instance_data.json")
 );
-let ram = instance_data["available_ram"];
+const ram = instance_data["available_ram"];
 
 //create writeable stream for the childprocess stdio.
-let mclogWriteStream = fs.createWriteStream("/var/log/mclog.txt");
+const mclogWriteStream = fs.createWriteStream("/var/log/mclog.txt");
 
 //spawn a child_process to run java. reference: child_process.spawn(command[, args][, options])
-let commandLineOpts = [
+const commandLineOpts = [
 	"-Xmx" + ram,
 	"-Xms" + ram,
 	"-jar",
 	"server.jar",
 	"nogui",
 ];
-let spawnOpts = { cwd: "/home/ec2-user/mc", stdio: ["pipe", "pipe", "pipe"] };
+const spawnOpts = { cwd: "/home/ec2-user/mc", stdio: ["pipe", "pipe", "pipe"] };
 const child = spawn("java", commandLineOpts, spawnOpts);
 
 child.stdout.pipe(mclogWriteStream);
@@ -75,7 +75,7 @@ function log(str) {
 	console.log("[mineShell] " + str);
 }
 
-let streamWatcher = new StreamWatcher(child);
+const streamWatcher = new StreamWatcher(child);
 streamWatcher.addOnExit(function () {
 	uploadWorld();
 	closeStack();
@@ -125,7 +125,7 @@ streamWatcher.addWatcher(/shut it down!!!/, function (stdin) {
 	shutdown();
 });
 
-let playerWatcher = new PlayerWatcher(shutdown);
+const playerWatcher = new PlayerWatcher(shutdown);
 playerWatcher.registerWithStreamWatcher(streamWatcher);
 
 // The SIGTERM event will be sent by systemctl when the service is stopped
