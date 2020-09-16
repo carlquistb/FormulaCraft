@@ -8,8 +8,8 @@
 	This script will handle boot up and boot down of the .jar file.
 
 */
-const StreamWatcher = require("./StreamWatcher.js");
-const PlayerWatcher = require("./PlayerWatcher.js");
+const StreamWatcher = require("./StreamWatcher");
+const PlayerWatcher = require("./PlayerWatcher");
 const fs = require("fs"); //fileserver library
 const spawn = require("child_process").spawn; //this function creates a child process (basically another shell for Minecraft to run in)
 const execFile = require("child_process").execFile;
