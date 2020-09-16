@@ -7,46 +7,21 @@ fi
 WORLD_URL=$1
 FLAVOR_URL=$2
 STACK_NAME=$3
+ENV_FILE=/etc/mineshell.env
 
-sudo yum install -y java-1.8.0 python3 gcc-c++
+sudo yum install -y java-1.8.0 gcc-c++
 # This script adds the nodejs repository to yum
 curl -sL https://rpm.nodesource.com/setup_10.x | sudo -E bash -
 sudo yum install -y nodejs
 
-cd /home/ec2-user
-#download the default scripts and service.
+echo "WORLD_URL=$WORLD_URL" > $ENV_FILE
+echo "FLAVOR_URL=$FLAVOR_URL" >> $ENV_FILE
+echo "STACK_NAME=$STACK_NAME" >> $ENV_FILE
+
 aws s3 sync s3://bc-minecraft-repo/scripts autostack-scripts
 aws s3 sync s3://bc-minecraft-repo/service autostack-service
 
-#download the flavor and world files.
-#These may contain overwriting script files such as a unique uploadworld script.
-aws s3 sync $FLAVOR_URL mc
-aws s3 sync $WORLD_URL mc
-
-INSTANCE_TYPE=$(curl -s http://169.254.169.254/latest/meta-data/instance-type)
-
-if [[ "$INSTANCE_TYPE" = "t3.micro" ]]; then
-	AVAILABLE_RAM=800M
-elif [[ "$INSTANCE_TYPE" = "m5.large" ]]; then
-	AVAILABLE_RAM=7G
-elif [[ "$INSTANCE_TYPE" = "r5.large" ]]; then
-	AVAILABLE_RAM=14G
-elif [[ "$INSTANCE_TYPE" = "m5.xlarge" ]]; then
-	AVAILABLE_RAM=14G
-elif [[ "$INSTANCE_TYPE" = "r5.xlarge" ]]; then
-	AVAILABLE_RAM=28G
-fi
-
-if [[ -z "$AVAILABLE_RAM" ]]; then
-	echo "Unkown instance type '$INSTANCE_TYPE'" > error.log
-	exit
-fi
-
-echo "{" > autostack-scripts/instance_data.json
-echo "\"available_ram\":\"$AVAILABLE_RAM\"," >> autostack-scripts/instance_data.json
-echo "\"world_url\":\"$WORLD_URL\"," >> autostack-scripts/instance_data.json
-echo "\"stack_name\":\"$STACK_NAME\"" >> autostack-scripts/instance_data.json
-echo "}" >> autostack-scripts/instance_data.json
+chown -R ec2-user:ec2-user *
 
 chmod +x /home/ec2-user/autostack-scripts/uploadworld
 chmod +x /home/ec2-user/autostack-scripts/closestack
