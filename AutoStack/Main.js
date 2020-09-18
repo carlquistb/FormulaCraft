@@ -7,7 +7,7 @@ const RAM_ALLOCATION_MAP = {
 	"m5.large": "7G",
 	"r5.large": "14G",
 	"m5.xlarge": "14G",
-	"r5.xlarge": "28G"
+	"r5.xlarge": "28G",
 };
 
 function exit(message) {
@@ -35,7 +35,9 @@ function startMineShell(instanceType, worldUrl, stackName) {
 
 function main(args) {
 	if (!args || args.length != 3) {
-		console.error("Usage: node Main.js <world url> <flavor url> <stack name>");
+		console.error(
+			"Usage: node Main.js <world url> <flavor url> <stack name>"
+		);
 		process.exit(1);
 	}
 
@@ -46,15 +48,22 @@ function main(args) {
 	sync(flavorUrl, "~/mc");
 	sync(worldUrl, "~/mc");
 
-	http.get("http://169.254.169.254/latest/meta-data/instance-type", (response) => {
-		if (response.errorCode < 200 || response.errorCode >= 300) {
-			throw new Error(`Couldn't get instance type, received error code '${response.statusMessage}'`);
-		}
+	http.get(
+		"http://169.254.169.254/latest/meta-data/instance-type",
+		(response) => {
+			if (response.errorCode < 200 || response.errorCode >= 300) {
+				throw new Error(
+					`Couldn't get instance type, received error code '${response.statusMessage}'`
+				);
+			}
 
-		let instanceType = "";
-		response.on('data', (data) => instanceType += data);
-		response.on('end', () => startMineShell(instanceType, worldUrl, stackName));
-	}).on("error", (e) => {
+			let instanceType = "";
+			response.on("data", (data) => (instanceType += data));
+			response.on("end", () =>
+				startMineShell(instanceType, worldUrl, stackName)
+			);
+		}
+	).on("error", (e) => {
 		exit(e.message);
 	});
 }
