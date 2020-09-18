@@ -4,6 +4,7 @@ After=network.target
 
 [Service]
 RestartSec=1
-User=root
-ExecStart=/bin/node /home/ec2-user/autostack-scripts/mineShell.js
+User=ec2-user
+EnvironmentFile=/etc/mineshell.env
+ExecStart=/bin/node /home/ec2-user/autostack-scripts/Main.js $WORLD_URL $FLAVOR_URL $STACK_NAME
 KillMode=process
