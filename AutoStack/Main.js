@@ -1,6 +1,6 @@
 const execSync = require("child_process").execSync;
 const http = require("http");
-const MineShell = require("./MineShell.js");
+const MineShell = require("./MineShell");
 
 const RAM_ALLOCATION_MAP = {
 	"t3.micro": "800M",
