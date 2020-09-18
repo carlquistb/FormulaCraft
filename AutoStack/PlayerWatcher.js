@@ -18,7 +18,6 @@ PlayerWatcher.prototype.registerWithStreamWatcher = function (streamWatcher) {
 };
 
 PlayerWatcher.prototype._attemptShutdown = function () {
-	console.log(this._loggedInPlayers);
 	if (this._loggedInPlayers.length === 0) {
 		this._shutdownFunc.call();
 	} else {
@@ -28,7 +27,6 @@ PlayerWatcher.prototype._attemptShutdown = function () {
 
 PlayerWatcher.prototype._addPlayer = function (stdin, regexData) {
 	this._loggedInPlayers.push(regexData[1]);
-	console.log(this._loggedInPlayers[0]);
 	this._updateInterval();
 };
 
