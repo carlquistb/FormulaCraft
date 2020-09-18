@@ -1,0 +1,19 @@
+name: Node.js CI
+on: [pull_request]
+
+jobs:
+  lint_js:
+    name: Running ESLint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.head_ref }}
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '14'
+      - run: cd AutoStack && npm install
+      - run: cd AutoStack && npm run lint
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Applying lint changes
