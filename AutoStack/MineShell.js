@@ -11,13 +11,19 @@
 const StreamWatcher = require("./StreamWatcher");
 const PlayerWatcher = require("./PlayerWatcher");
 const fs = require("fs"); //fileserver library
-const spawn = require("child_process").spawn; //this function creates a child process (basically another shell for Minecraft to run in)
-const execFileSync = require("child_process").execFileSync;
+const AWS = require("./AWS");
+const { spawn } = require("child_process"); //this function creates a child process (basically another shell for Minecraft to run in)
 
-function MineShell(ram, worldUrl, stackName) {
+const SERVER_FOLDER_PATH = "/home/ec2-user/mc/";
+
+function MineShell(ram, worldUrl, stackName, config) {
 	this._ram = ram;
+	if (worldUrl.charAt(worldUrl.length - 1) != "/") {
+		worldUrl += "/";
+	}
 	this._worldUrl = worldUrl;
 	this._stackName = stackName;
+	this._config = config;
 	this._logFile = fs.createWriteStream("/home/ec2-user/mclog.txt");
 
 	//spawn a child_process to run java. reference: child_process.spawn(command[, args][, options])
@@ -74,8 +80,15 @@ MineShell.prototype._initWatchers = function () {
 		// I am using a 5 second timeout for right now, but I think we can implement this with a second
 		// watcher that waits for the save to be completed.
 		setTimeout(() => {
-			this._uploadWorld();
 			stdin.write("say cloud save initiated\n");
+			stdin.write("save-off\n");
+			try {
+				this._uploadWorld();
+			} catch (e) {
+				stdin.write(`say ${e.message}\n`);
+			}
+			stdin.write("save-on\n");
+			stdin.write("say Save finished");
 		}, 5000);
 	});
 
@@ -107,16 +120,22 @@ MineShell.prototype._exit = function () {
 
 MineShell.prototype._uploadWorld = function () {
 	this._log("Uploading world...");
-	execFileSync("/home/ec2-user/autostack-scripts/uploadworld", [
-		this._worldUrl,
-	]);
+	for (const folder of this._config.syncFolders) {
+		AWS.sync(SERVER_FOLDER_PATH + folder, this._worldUrl + folder);
+	}
+
+	for (const file of this._config.syncFiles) {
+		AWS.cp(SERVER_FOLDER_PATH + file, this._worldUrl + file);
+	}
 };
 
 MineShell.prototype._closeStack = function () {
 	this._log("closing stack...");
-	execFileSync("/home/ec2-user/autostack-scripts/closestack", [
-		this._stackName,
-	]);
+	try {
+		AWS.deleteStack(this._stackName);
+	} catch (e) {
+		this._log("unable to delete stack");
+	}
 };
 
 MineShell.prototype._log = function (str) {
