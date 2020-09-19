@@ -1,6 +1,9 @@
-const execSync = require("child_process").execSync;
+const AWS = require("./AWS");
+const fs = require("fs");
 const http = require("http");
 const MineShell = require("./MineShell");
+
+const FLAVOR_CONFIG_PATH = "/home/ec2-user/mc/autostack-config.json";
 
 const RAM_ALLOCATION_MAP = {
 	"t3.micro": "800M",
@@ -10,22 +13,51 @@ const RAM_ALLOCATION_MAP = {
 	"r5.xlarge": "28G",
 };
 
+const DEFAULT_CONFIG = {
+	syncFiles: [
+		"banned-ips.json",
+		"banned-players.json",
+		"ops.json",
+		"server.properties",
+		"whitelist.json",
+	],
+	syncFolders: ["world"],
+};
+
 function exit(message) {
 	console.error(message);
 	process.exit(1);
 }
 
-function sync(from, to) {
-	execSync(`aws s3 sync ${from} ${to}`);
+function loadConfig() {
+	if (!fs.existsSync(FLAVOR_CONFIG_PATH)) {
+		return DEFAULT_CONFIG;
+	}
+
+	const rawConfig = fs.readFileSync(FLAVOR_CONFIG_PATH);
+	let parsedConfig = DEFAULT_CONFIG;
+	try {
+		parsedConfig = JSON.parse(rawConfig);
+	} catch (e) {
+		exit(e);
+	}
+
+	for (const key in DEFAULT_CONFIG) {
+		if (!(key in parsedConfig)) {
+			parsedConfig[key] = DEFAULT_CONFIG[key];
+		}
+	}
+
+	return parsedConfig;
 }
 
-function startMineShell(instanceType, worldUrl, stackName) {
+function startMineShell(instanceType, worldUrl, stackName, config) {
 	if (!(instanceType in RAM_ALLOCATION_MAP)) {
 		exit(`Unkown instance type: ${instanceType}`);
 	}
 
 	const ram = RAM_ALLOCATION_MAP[instanceType];
-	const mineShell = new MineShell(ram, worldUrl, stackName);
+	const mineShell = new MineShell(ram, worldUrl, stackName, config);
 
 	// The SIGTERM event will be sent by systemctl when the service is stopped
 	process.on("SIGTERM", () => {
@@ -35,18 +67,16 @@ function startMineShell(instanceType, worldUrl, stackName) {
 
 function main(args) {
 	if (!args || args.length != 3) {
-		console.error(
-			"Usage: node Main.js <world url> <flavor url> <stack name>"
-		);
-		process.exit(1);
+		exit("Usage: node Main.js <world url> <flavor url> <stack name>");
 	}
 
 	const worldUrl = args[0];
 	const flavorUrl = args[1];
 	const stackName = args[2];
+	const config = loadConfig();
 
-	sync(flavorUrl, "~/mc");
-	sync(worldUrl, "~/mc");
+	AWS.sync(flavorUrl, "~/mc");
+	AWS.sync(worldUrl, "~/mc");
 
 	http.get(
 		"http://169.254.169.254/latest/meta-data/instance-type",
@@ -60,7 +90,7 @@ function main(args) {
 			let instanceType = "";
 			response.on("data", (data) => (instanceType += data));
 			response.on("end", () =>
-				startMineShell(instanceType, worldUrl, stackName)
+				startMineShell(instanceType, worldUrl, stackName, config)
 			);
 		}
 	).on("error", (e) => {
