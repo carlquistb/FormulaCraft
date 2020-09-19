@@ -1,0 +1,89 @@
+{
+    "$schema": "FormulaCraft/AutoStack/.autostack-config-schema.json",
+    "type": "object",
+    "title": "autostack-config schema",
+    "description": "Schema defining configuration data for autostacks. Default minecraft settings are used if no file is included in a flavor definition.",
+    "default": {},
+    "examples": [
+        {
+            "syncFolders": [
+                "world",
+                "config",
+                "local",
+                "structurize",
+                "structures",
+                "TombManyGraves",
+                "astralsorcery",
+                "patchouli_books",
+                "journeymap"
+            ],
+            "syncFiles": [
+                "options.txt",
+                "banned-ips.json",
+                "banned-players.json",
+                "ops.json",
+                "server.properties",
+                "whitelist.json"
+            ]
+        }
+    ],
+    "required": [],
+    "properties": {
+        "syncFolders": {
+            "type": "array",
+            "title": "syncFolders",
+            "description": "A list of folders containing world-related data. Synced to the world files in S3.",
+            "default": [],
+            "examples": [
+                [
+                    "world",
+                    "config",
+										"structures"
+                ]
+            ],
+            "additionalItems": true,
+            "items": {
+                "anyOf": [
+                    {
+                        "$id": "#/properties/syncFolders/items/anyOf/0",
+                        "type": "string",
+                        "title": "folder",
+                        "description": "A filepath describing the folder to be saved. root is the mc environment, where the mc jar file is ran.",
+                        "default": "",
+                        "examples": [
+                            "world"
+                        ]
+                    }
+                ]
+            }
+        },
+        "syncFiles": {
+            "type": "array",
+            "title": "syncFiles",
+            "description": "A list of files containing world-related data. Synced to the world files in S3.",
+            "default": [],
+            "examples": [
+                [
+                    "options.txt",
+                    "banned-ips.json"
+                ]
+            ],
+            "additionalItems": true,
+            "items": {
+                "anyOf": [
+                    {
+                        "type": "string",
+                        "title": "file",
+                        "description": "A filepath describing the file to be saved. root is the mc environment, where the mc jar file is ran.",
+                        "default": "",
+                        "examples": [
+                            "options.txt",
+                            "banned-ips.json"
+                        ]
+                    }
+                ]
+            }
+        }
+    },
+    "additionalProperties": true
+}
