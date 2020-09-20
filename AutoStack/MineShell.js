@@ -111,10 +111,9 @@ MineShell.prototype._exit = function () {
 };
 
 MineShell.prototype._uploadWorld = function () {
-
 	this._log("Uploading world...");
-	stdin.write("say cloud save initiated, server saving halted\n");
-	stdin.write("save-off\n");
+	this._child.stdin.write("say cloud save initiated, server saving halted\n");
+	this._child.stdin.write("save-off\n");
 	try {
 		for (const folder of this._config.syncFolders) {
 			AWS.sync(SERVER_FOLDER_PATH + folder, this._worldUrl + folder);
@@ -123,12 +122,17 @@ MineShell.prototype._uploadWorld = function () {
 			AWS.cp(SERVER_FOLDER_PATH + file, this._worldUrl + file);
 		}
 	} catch (e) {
-		stdin.write("say cloud error occured! Attempt to save again or contact your system administrator before exiting.\n");
+		this._child.stdin.stdin.write(
+			"say cloud error occured! Attempt to save again or contact your system administrator before exiting.\n"
+		);
 		this._log(e.message);
 	}
-	stdin.write("save-on\n");
-	stdin.write("say cloud save completed, server saving resumed\n");
-
+	if (!this._child.stdin.writeableEnded) {
+		this._child.stdin.stdin.write("save-on\n");
+		this._child.stdin.stdin.write(
+			"say cloud save completed, server saving resumed\n"
+		);
+	}
 };
 
 MineShell.prototype._closeStack = function () {
