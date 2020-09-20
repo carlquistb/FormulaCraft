@@ -80,15 +80,7 @@ MineShell.prototype._initWatchers = function () {
 		// I am using a 5 second timeout for right now, but I think we can implement this with a second
 		// watcher that waits for the save to be completed.
 		setTimeout(() => {
-			stdin.write("say cloud save initiated\n");
-			stdin.write("save-off\n");
-			try {
-				this._uploadWorld();
-			} catch (e) {
-				stdin.write(`say ${e.message}\n`);
-			}
-			stdin.write("save-on\n");
-			stdin.write("say Save finished");
+			this._uploadWorld();
 		}, 5000);
 	});
 
@@ -119,14 +111,24 @@ MineShell.prototype._exit = function () {
 };
 
 MineShell.prototype._uploadWorld = function () {
-	this._log("Uploading world...");
-	for (const folder of this._config.syncFolders) {
-		AWS.sync(SERVER_FOLDER_PATH + folder, this._worldUrl + folder);
-	}
 
-	for (const file of this._config.syncFiles) {
-		AWS.cp(SERVER_FOLDER_PATH + file, this._worldUrl + file);
+	this._log("Uploading world...");
+	stdin.write("say cloud save initiated, server saving halted\n");
+	stdin.write("save-off\n");
+	try {
+		for (const folder of this._config.syncFolders) {
+			AWS.sync(SERVER_FOLDER_PATH + folder, this._worldUrl + folder);
+		}
+		for (const file of this._config.syncFiles) {
+			AWS.cp(SERVER_FOLDER_PATH + file, this._worldUrl + file);
+		}
+	} catch (e) {
+		stdin.write(`say ${e.message}\n`);
+		this._log(e.message);
 	}
+	stdin.write("save-on\n");
+	stdin.write("say cloud save completed, server saving resumed\n");
+
 };
 
 MineShell.prototype._closeStack = function () {
