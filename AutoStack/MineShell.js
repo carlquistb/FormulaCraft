@@ -80,7 +80,7 @@ MineShell.prototype._initWatchers = function () {
 		// I am using a 5 second timeout for right now, but I think we can implement this with a second
 		// watcher that waits for the save to be completed.
 		setTimeout(() => {
-			this._uploadWorld();
+			this._uploadWorld(true);
 		}, 5000);
 	});
 
@@ -94,7 +94,7 @@ MineShell.prototype._initWatchers = function () {
 	const playerWatcher = new PlayerWatcher(() => this.shutdown());
 	playerWatcher.registerWithStreamWatcher(streamWatcher);
 
-	setInterval(() => this._uploadWorld(), 1000 * 60 * 15); //run the uploadWorld method every 15 minutes.
+	setInterval(() => this._uploadWorld(true), 1000 * 60 * 15); //run the uploadWorld method every 15 minutes.
 };
 
 MineShell.prototype.shutdown = function () {
@@ -104,34 +104,42 @@ MineShell.prototype.shutdown = function () {
 };
 
 MineShell.prototype._exit = function () {
-	this._uploadWorld();
+	this._uploadWorld(false);
 	this._closeStack();
 	this._logFile.end();
 	process.exit(0);
 };
 
-MineShell.prototype._uploadWorld = function () {
+MineShell.prototype._uploadWorld = function (doNotification) {
 	this._log("Uploading world...");
-	this._child.stdin.write("say cloud save initiated, server saving halted\n");
-	this._child.stdin.write("save-off\n");
 	try {
-		for (const folder of this._config.syncFolders) {
-			AWS.sync(SERVER_FOLDER_PATH + folder, this._worldUrl + folder);
+		if (doNotification) {
+			this._child.stdin.write(
+				"say cloud save initiated, server saving halted\n"
+			);
+			this._child.stdin.write("save-off\n");
 		}
-		for (const file of this._config.syncFiles) {
-			AWS.cp(SERVER_FOLDER_PATH + file, this._worldUrl + file);
+		try {
+			for (const folder of this._config.syncFolders) {
+				AWS.sync(SERVER_FOLDER_PATH + folder, this._worldUrl + folder);
+			}
+			for (const file of this._config.syncFiles) {
+				AWS.cp(SERVER_FOLDER_PATH + file, this._worldUrl + file);
+			}
+		} catch (e) {
+			this._child.stdin.stdin.write(
+				"say cloud error occured! Attempt to save again or contact your system administrator before exiting.\n"
+			);
+			this._log(e.message);
+		}
+		if (doNotification) {
+			this._child.stdin.stdin.write("save-on\n");
+			this._child.stdin.stdin.write(
+				"say cloud save completed, server saving resumed\n"
+			);
 		}
 	} catch (e) {
-		this._child.stdin.stdin.write(
-			"say cloud error occured! Attempt to save again or contact your system administrator before exiting.\n"
-		);
 		this._log(e.message);
-	}
-	if (!this._child.stdin.writeableEnded) {
-		this._child.stdin.stdin.write("save-on\n");
-		this._child.stdin.stdin.write(
-			"say cloud save completed, server saving resumed\n"
-		);
 	}
 };
 
