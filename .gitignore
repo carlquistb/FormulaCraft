@@ -3,4 +3,4 @@
 *.txt
 FormulaStack/clientPortal/dev/
 FormulaStack/DiscordBot/
-AutoStack/node_modules
+node_modules

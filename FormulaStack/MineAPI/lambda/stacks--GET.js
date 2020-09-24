@@ -19,167 +19,186 @@ output:
 
 */
 
-const aws = require('aws-sdk');
+const aws = require("aws-sdk");
 
 const cfn = new aws.CloudFormation();
 
 exports.handler = async (event, context, callback) => {
+	const params = {
+		StackStatusFilter: [
+			"CREATE_COMPLETE",
+			"CREATE_IN_PROGRESS",
+			"DELETE_IN_PROGRESS",
+		],
+	};
 
-    let params = {
-      StackStatusFilter: ['CREATE_COMPLETE', 'CREATE_IN_PROGRESS', 'DELETE_IN_PROGRESS']
-    };
+	console.log("querying current stacks");
 
-    console.log('querying current stacks');
+	let listStacksData;
 
-    let listStacksData;
+	try {
+		listStacksData = await cfn.listStacks(params).promise();
+	} catch (err) {
+		console.log(err, err.stack);
 
-    try {
-      listStacksData = await cfn.listStacks(params).promise();
-    }
-    catch (err) {
-      console.log(err, err.stack);
+		//define and return response
+		const response = {
+			isBase64Encoded: true,
+			statusCode: 400,
+			headers: {
+				"x-custom-header": "my custom header value",
+				"Access-Control-Allow-Origin": "*",
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({}),
+		};
 
-      //define and return response
-      let response = {
-        isBase64Encoded: true,
-        statusCode: 400,
-        headers: {
-          "x-custom-header" : "my custom header value",
-          'Access-Control-Allow-Origin':'*',
-          "Content-Type" : "application/json"
-        },
-        body: JSON.stringify({})
-      };
+		callback(err, response);
+		return;
+	}
 
-      callback(err, response);
-      return;
-    }
+	console.log("logging number of retreived stacks");
+	console.log(listStacksData.StackSummaries.length);
+	console.log(listStacksData.StackSummaries);
 
-    console.log("logging number of retreived stacks");
-    console.log(listStacksData.StackSummaries.length);
-    console.log(listStacksData.StackSummaries);
+	const stacks = await Promise.all(
+		listStacksData.StackSummaries.map(parseStackInfo)
+	);
 
-    let stacks = await Promise.all(
-    	listStacksData.StackSummaries.map(parseStackInfo)
-    );
+	//define and return HTTP response
+	const responseBody = {
+		numStacks: listStacksData.StackSummaries.length,
+		stacks: stacks,
+	};
 
-    //define and return HTTP response
-    let responseBody = {
-      numStacks: listStacksData.StackSummaries.length,
-      stacks: stacks
-    };
+	const response = {
+		isBase64Encoded: true,
+		statusCode: 200,
+		headers: {
+			"x-custom-header": "my custom header value",
+			"Access-Control-Allow-Origin": "*",
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify(responseBody),
+	};
 
-    let response = {
-      isBase64Encoded: true,
-      statusCode: 200,
-      headers: {
-        "x-custom-header" : "my custom header value",
-        'Access-Control-Allow-Origin':'*',
-        "Content-Type" : "application/json"
-      },
-      body: JSON.stringify(responseBody)
-    };
+	console.log("logging response");
+	console.log("resonse: ", response);
 
-    console.log("logging response");
-    console.log("resonse: ", response);
-
-    callback(null, response);
-
-}
+	callback(null, response);
+};
 
 async function parseStackInfo(summary) {
 	//list stack resources
-	console.log('logging id of each stack: ' + summary.StackId);
-	let stackIps = await getStackIps(summary.StackId, summary.StackStatus);
+	console.log("logging id of each stack: " + summary.StackId);
+	const stackIps = await getStackIps(summary.StackId, summary.StackStatus);
 	console.log("stackIps: ", stackIps);
 	return {
 		stackId: summary.StackId,
 		stackName: summary.StackName,
 		stackCreationTime: summary.CreationTime,
 		stackStatus: summary.StackStatus,
-		stackIps: stackIps
+		stackIps: stackIps,
 	};
 }
 
 //returns array of Strings representing public ipv4 addresses for the stack.
 async function getStackIps(stackId, stackStatus) {
+	//ONLY attempt to fetch IPs of currently active stacks.
+	if (stackStatus != "CREATE_COMPLETE") {
+		return null;
+	}
 
-  //ONLY attempt to fetch IPs of currently active stacks.
-  if(stackStatus != "CREATE_COMPLETE") {
-    return (null);
-  }
+	const listStackResourcesParams = {
+		StackName: stackId,
+	};
 
-  let listStackResourcesParams = {
-    StackName: stackId
-  };
+	let resourcesData;
 
-  let resourcesData;
+	//TODO: error handling
+	try {
+		resourcesData = await cfn
+			.listStackResources(listStackResourcesParams)
+			.promise();
+	} catch (err) {
+		console.log(err, err.stack);
+		return;
+	}
 
-  //TODO: error handling
-  try {
-    resourcesData = await cfn.listStackResources(listStackResourcesParams).promise();
-  }
-  catch (err){
-    console.log(err, err.stack);
-    return;
-  }
+	//find the resources with type AWS::EC2::SpotFleet (expected: 1)
 
-  //find the resources with type AWS::EC2::SpotFleet (expected: 1)
+	const spotfleets = resourcesData.StackResourceSummaries.filter(function (
+		resource
+	) {
+		return resource.ResourceType === "AWS::EC2::SpotFleet";
+	});
 
-  let spotfleets = resourcesData.StackResourceSummaries.filter(function(resource) {
-    return resource.ResourceType === 'AWS::EC2::SpotFleet';
-  });
+	if (spotfleets.length > 1) {
+		console.log(
+			"ERROR: stack contains more than one spotfleet resource. Each stack is expected to have a single spotfleet resource."
+		);
+		return;
+	}
 
-  if(spotfleets.length > 1) {
-    console.log("ERROR: stack contains more than one spotfleet resource. Each stack is expected to have a single spotfleet resource.");
-    return;
-  }
+	if (spotfleets.length < 1) {
+		console.log(
+			"ERROR: stack contains less than one spotfleet resource. Each stack is expected to have a single spotfleet resource."
+		);
+		return;
+	}
 
-  if(spotfleets.length < 1) {
-    console.log("ERROR: stack contains less than one spotfleet resource. Each stack is expected to have a single spotfleet resource.");
-    return;
-  }
+	const spotfleet = spotfleets[0];
 
-  let spotfleet = spotfleets[0];
+	//get the ips of all instances (expected: 1) in the spotfleet
+	const ec2 = new aws.EC2();
+	const describeSpotFleetInstancesParams = {
+		SpotFleetRequestId: spotfleet.PhysicalResourceId,
+	};
 
-  //get the ips of all instances (expected: 1) in the spotfleet
-  let ec2 = new aws.EC2();
-  let describeSpotFleetInstancesParams = {
-    SpotFleetRequestId: spotfleet.PhysicalResourceId
-  };
+	let describeSpotFleetInstancesData;
 
-  let describeSpotFleetInstancesData;
+	try {
+		describeSpotFleetInstancesData = await ec2
+			.describeSpotFleetInstances(describeSpotFleetInstancesParams)
+			.promise();
+	} catch (err) {
+		console.log(err, err.stack);
+		return;
+	}
 
-  try{
-    describeSpotFleetInstancesData = await ec2.describeSpotFleetInstances(describeSpotFleetInstancesParams).promise();
-  }
-  catch (err) {
-    console.log(err, err.stack);
-    return;
-  }
+	if (describeSpotFleetInstancesData.ActiveInstances.length != 1) {
+		console.log(
+			"ERROR: spotfleet contains " +
+				describeSpotFleetInstancesData.ActiveInstances.length +
+				"instances. Each spotfleet is expected to have a single instance."
+		);
+		return;
+	}
 
-  if(describeSpotFleetInstancesData.ActiveInstances.length != 1) {
-    console.log("ERROR: spotfleet contains " + describeSpotFleetInstancesData.ActiveInstances.length + "instances. Each spotfleet is expected to have a single instance.");
-    return;
-  }
+	const describeInstancesparams = {
+		InstanceIds: [
+			describeSpotFleetInstancesData.ActiveInstances[0].InstanceId,
+		],
+	};
 
-  let describeInstancesparams = {
-      InstanceIds: [describeSpotFleetInstancesData.ActiveInstances[0].InstanceId]
-  };
+	let describeInstancesData;
 
-  let describeInstancesData;
+	try {
+		describeInstancesData = await ec2
+			.describeInstances(describeInstancesparams)
+			.promise();
+	} catch (err) {
+		console.log(err, err.stack);
+	}
 
-  try{
-    describeInstancesData = await ec2.describeInstances(describeInstancesparams).promise();
-  }
-  catch (err) {
-    console.log(err, err.stack);
-  }
+	const ips = describeInstancesData.Reservations[0].Instances.map(function (
+		instance
+	) {
+		return instance.PublicIpAddress;
+	});
 
-  let ips = describeInstancesData.Reservations[0].Instances.map(function(instance) {return instance.PublicIpAddress;});
+	console.log("logging ip");
+	console.log("ip:", ips[0]);
 
-  console.log("logging ip");
-  console.log("ip:",ips[0]);
-
-  return(ips);
+	return ips;
 }
