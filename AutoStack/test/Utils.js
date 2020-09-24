@@ -1,5 +1,5 @@
 const sinon = require("sinon");
-const StreamWatcher = require("./../StreamWatcher");
+const StreamWatcher = require("./../ec2/StreamWatcher");
 
 function createStreamWatcher() {
 	const mockChildProcess = sinon.mock();
