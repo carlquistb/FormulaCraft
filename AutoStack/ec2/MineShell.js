@@ -127,14 +127,14 @@ MineShell.prototype._uploadWorld = function (doNotification) {
 				AWS.cp(SERVER_FOLDER_PATH + file, this._worldUrl + file);
 			}
 		} catch (e) {
-			this._child.stdin.stdin.write(
+			this._child.stdin.write(
 				"say cloud error occured! Attempt to save again or contact your system administrator before exiting.\n"
 			);
 			this._log(e.message);
 		}
 		if (doNotification) {
-			this._child.stdin.stdin.write("save-on\n");
-			this._child.stdin.stdin.write(
+			this._child.stdin.write("save-on\n");
+			this._child.stdin.write(
 				"say cloud save completed, server saving resumed\n"
 			);
 		}
