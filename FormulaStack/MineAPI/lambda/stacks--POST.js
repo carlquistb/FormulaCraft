@@ -15,7 +15,7 @@ output:
 exports.handler = (event, context, callback) => {
 
     const ROLE_ARN = "arn:aws:iam::376177114739:role/CloudformationRole";
-    const TEMPLATE_URL = "https://bc-minecraft-repo.s3-us-west-2.amazonaws.com/scripts/InstanceStack.yaml";
+    const TEMPLATE_URL = "https://bc-minecraft-repo.s3-us-west-2.amazonaws.com/cloudformation-templates/InstanceStack.yaml";
     const NETWORK_STACK_NAME = "network-stack";
     const KEY_PAIR = "mc-test";
 

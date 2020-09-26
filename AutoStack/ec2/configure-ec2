@@ -19,12 +19,8 @@ echo "FLAVOR_URL=$FLAVOR_URL" >> $ENV_FILE
 echo "STACK_NAME=$STACK_NAME" >> $ENV_FILE
 
 aws s3 sync s3://bc-minecraft-repo/scripts autostack-scripts
-aws s3 sync s3://bc-minecraft-repo/service autostack-service
 
 chown -R ec2-user:ec2-user *
 
-chmod +x /home/ec2-user/autostack-scripts/uploadworld
-chmod +x /home/ec2-user/autostack-scripts/closestack
-
-cp autostack-service/mineService.service /etc/systemd/system/mineService.service
+cp autostack-scripts/mineService.service /etc/systemd/system/mineService.service
 systemctl start mineService

@@ -1,7 +1,7 @@
 const test = require("ava");
 const sinon = require("sinon");
 const { createStreamWatcher } = require("./Utils");
-const PlayerWatcher = require("./../PlayerWatcher");
+const PlayerWatcher = require("./../ec2/PlayerWatcher");
 
 function simulatePlayerJoined(streamWatcher, playerName, extraString) {
 	extraString = extraString || "";
