@@ -2,7 +2,7 @@
   "name": "autostack",
   "description": "Runs a Minecraft server with additional AWS interfacing",
   "license": "MIT",
-  "repository": "https://github.com/carlquistb/FormulaCraf/",
+  "repository": "https://github.com/carlquistb/FormulaCraft/",
   "devDependencies": {
     "ava": "^3.12.1",
     "eslint": "^7.9.0",
@@ -19,7 +19,7 @@
   },
   "ava": {
     "files": [
-      "!test/Utils.js"
+      "!Autostack/test/Utils.js"
     ]
   }
 }

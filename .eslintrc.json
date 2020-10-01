@@ -6,9 +6,6 @@
     },
     "extends": [
         "eslint:recommended",
-        "plugin:prettier/recommended"
-    ],
-    "plugins": [
         "prettier"
     ],
     "parserOptions": {
@@ -36,5 +33,6 @@
         "no-invalid-this": "error",
         "no-useless-call": "error",
         "no-useless-return": "error"
-    }
+    },
+    "ignorePatterns": ["FormulaStack/clientPortal"]
 }

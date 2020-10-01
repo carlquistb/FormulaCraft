@@ -1,4 +1,3 @@
-
 /*
 
 name: listAutoStacks
@@ -16,25 +15,25 @@ toDo:
 
 */
 
-exports.handler = (event, context, callback) => {
-    //console.log('Received event:', JSON.stringify(event, null, 2));
-    console.log('entered exports.handler');
+exports.handler = () => {
+	//console.log('Received event:', JSON.stringify(event, null, 2));
+	console.log("entered exports.handler");
 
-    const aws = require('aws-sdk');
-    const cfn = new aws.CloudFormation();
+	const aws = require("aws-sdk");
+	const cfn = new aws.CloudFormation();
 
-    let params = {
-        StackStatusFilter: ['CREATE_COMPLETE']
-    };
-    console.log('created params');
-    cfn.listStacks(params, (err, data) => {
-        if (err) {
-            console.log('DescribeStacks call failed. \n', err);
-        } else {
-            //console.log();('successfully reached callback for listStacks');
-            console.log(data.StackSummaries);
-        }
-    });
+	const params = {
+		StackStatusFilter: ["CREATE_COMPLETE"],
+	};
+	console.log("created params");
+	cfn.listStacks(params, (err, data) => {
+		if (err) {
+			console.log("DescribeStacks call failed. \n", err);
+		} else {
+			//console.log();('successfully reached callback for listStacks');
+			console.log(data.StackSummaries);
+		}
+	});
 };
 
 /*
